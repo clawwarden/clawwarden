@@ -1,0 +1,31 @@
+{
+  "name": "vaultex",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source AI Trust Infrastructure for regulated enterprises",
+  "license": "Apache-2.0",
+  "homepage": "https://vaultex.space",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sammy995/vaultex"
+  },
+  "type": "module",
+  "workspaces": [
+    "packages/integrations",
+    "packages/finsafe-core",
+    "sdk/typescript"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

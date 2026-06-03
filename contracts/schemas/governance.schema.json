@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentguard.dev/contracts/governance.schema.json",
+  "title": "AgentGuard Governance Engine",
+  "description": "Domain entities and request bodies for the shared Governance Service. Wire format is camelCase and mirrors packages/core/src/index.ts.",
+  "$defs": {
+    "PolicyVersionStatus": {
+      "type": "string",
+      "enum": ["draft", "active", "superseded", "archived"]
+    },
+    "ApprovalRequestType": {
+      "type": "string",
+      "enum": ["policy_change", "exception", "override", "detokenization"]
+    },
+    "ApprovalStatus": {
+      "type": "string",
+      "enum": ["pending", "approved", "denied", "expired", "cancelled"]
+    },
+    "ApprovalDecision": { "type": "string", "enum": ["approve", "deny"] },
+    "ExceptionStatus": {
+      "type": "string",
+      "enum": ["active", "revoked", "expired"]
+    },
+    "AuditActorType": {
+      "type": "string",
+      "enum": ["user", "api_key", "system"]
+    },
+    "EvidenceType": {
+      "type": "string",
+      "enum": ["call_record", "metric_snapshot", "policy_version", "finsafe_finding", "external"]
+    },
+    "ComplianceFramework": {
+      "type": "string",
+      "enum": ["nist_ai_rmf", "sr_11_7", "soc2", "iso_42001", "iso_27001", "eu_ai_act"]
+    },
+    "ControlStatus": {
+      "type": "string",
+      "enum": ["not_implemented", "in_progress", "implemented", "not_applicable"]
+    },
+
+    "AuditEvent": {
+      "type": "object",
+      "description": "One link in the tamper-evident audit chain. entryHash chains to prevHash.",
+      "required": ["id", "tenantId", "seq", "eventType", "actorType", "payload", "entryHash", "createdAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "seq": { "type": "integer", "minimum": 1 },
+        "eventType": { "type": "string" },
+        "actorType": { "$ref": "#/$defs/AuditActorType" },
+        "actorId": { "type": ["string", "null"] },
+        "resourceType": { "type": ["string", "null"] },
+        "resourceId": { "type": ["string", "null"] },
+        "action": { "type": ["string", "null"] },
+        "policyVersionId": { "type": ["string", "null"], "description": "Explainability: WHICH policy version applied." },
+        "reason": { "type": ["string", "null"], "description": "Explainability: WHY." },
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "description": "Explainability: HOW sure." },
+        "payload": { "type": "object", "description": "Explainability: WHAT." },
+        "prevHash": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "entryHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "PolicyVersion": {
+      "type": "object",
+      "required": ["id", "tenantId", "policyId", "version", "name", "enforcementMode", "verdictTrigger", "action", "config", "status", "createdAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "policyId": { "type": "string", "format": "uuid" },
+        "version": { "type": "integer", "minimum": 1 },
+        "name": { "type": "string" },
+        "enforcementMode": { "type": "string", "enum": ["observe", "constrain", "gate"] },
+        "verdictTrigger": { "type": "string", "enum": ["viable", "marginal", "non-viable"] },
+        "action": { "type": "string", "enum": ["none", "alert_only", "cap_retries", "cap_budget", "route_model", "block_new_tasks"] },
+        "config": { "type": "object" },
+        "changeSummary": { "type": ["string", "null"] },
+        "status": { "$ref": "#/$defs/PolicyVersionStatus" },
+        "createdByUserId": { "type": ["string", "null"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "ApprovalRequest": {
+      "type": "object",
+      "required": ["id", "tenantId", "requestType", "subjectType", "subjectId", "requestedByUserId", "justification", "status", "requiredApprovals", "currentApprovals", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "requestType": { "$ref": "#/$defs/ApprovalRequestType" },
+        "subjectType": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "policyVersionId": { "type": ["string", "null"] },
+        "requestedByUserId": { "type": "string" },
+        "justification": { "type": "string" },
+        "status": { "$ref": "#/$defs/ApprovalStatus" },
+        "requiredApprovals": { "type": "integer", "minimum": 1 },
+        "currentApprovals": { "type": "integer", "minimum": 0 },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "GovernanceException": {
+      "type": "object",
+      "required": ["id", "tenantId", "scopeType", "scopeId", "reason", "status", "validFrom", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "approvalRequestId": { "type": ["string", "null"] },
+        "scopeType": { "type": "string" },
+        "scopeId": { "type": "string" },
+        "reason": { "type": "string" },
+        "grantedByUserId": { "type": ["string", "null"] },
+        "status": { "$ref": "#/$defs/ExceptionStatus" },
+        "validFrom": { "type": "string", "format": "date-time" },
+        "validUntil": { "type": ["string", "null"], "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "SignOff": {
+      "type": "object",
+      "required": ["id", "tenantId", "subjectType", "subjectId", "attestation", "signedByUserId", "signatureHash", "createdAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "subjectType": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "attestation": { "type": "string" },
+        "signedByUserId": { "type": "string" },
+        "signatureHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "Control": {
+      "type": "object",
+      "required": ["id", "tenantId", "framework", "controlRef", "title", "status", "createdAt", "updatedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "framework": { "$ref": "#/$defs/ComplianceFramework" },
+        "controlRef": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "status": { "$ref": "#/$defs/ControlStatus" },
+        "ownerUserId": { "type": ["string", "null"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "Evidence": {
+      "type": "object",
+      "required": ["id", "tenantId", "evidenceType", "refType", "refId", "content", "collectedAt"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "tenantId": { "type": "string", "format": "uuid" },
+        "evidenceType": { "$ref": "#/$defs/EvidenceType" },
+        "refType": { "type": "string" },
+        "refId": { "type": "string" },
+        "auditEventId": { "type": ["string", "null"] },
+        "controlId": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "content": { "type": "object" },
+        "collectedBy": { "type": ["string", "null"] },
+        "collectedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "ChainVerification": {
+      "type": "object",
+      "required": ["valid", "brokenAtSeq", "reason"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "brokenAtSeq": { "type": ["integer", "null"] },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+
+    "AppendAuditEventRequest": {
+      "type": "object",
+      "required": ["eventType"],
+      "properties": {
+        "eventType": { "type": "string", "maxLength": 100 },
+        "actorType": { "$ref": "#/$defs/AuditActorType", "default": "system" },
+        "actorId": { "type": ["string", "null"] },
+        "resourceType": { "type": ["string", "null"] },
+        "resourceId": { "type": ["string", "null"] },
+        "action": { "type": ["string", "null"] },
+        "policyVersionId": { "type": ["string", "null"], "format": "uuid" },
+        "reason": { "type": ["string", "null"] },
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "payload": { "type": "object", "default": {} }
+      }
+    },
+
+    "CreatePolicyVersionRequest": {
+      "type": "object",
+      "properties": {
+        "overrides": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "enforcementMode": { "type": "string", "enum": ["observe", "constrain", "gate"] },
+            "verdictTrigger": { "type": "string", "enum": ["viable", "marginal", "non-viable"] },
+            "action": { "type": "string", "enum": ["none", "alert_only", "cap_retries", "cap_budget", "route_model", "block_new_tasks"] },
+            "config": { "type": "object" }
+          }
+        },
+        "changeSummary": { "type": "string", "maxLength": 1000 }
+      }
+    },
+
+    "CreateApprovalRequest": {
+      "type": "object",
+      "required": ["requestType", "subjectType", "subjectId", "justification"],
+      "properties": {
+        "requestType": { "$ref": "#/$defs/ApprovalRequestType" },
+        "subjectType": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "policyVersionId": { "type": "string", "format": "uuid" },
+        "justification": { "type": "string", "maxLength": 2000 },
+        "requiredApprovals": { "type": "integer", "minimum": 1, "maximum": 10, "default": 1 },
+        "expiresAt": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "RecordDecisionRequest": {
+      "type": "object",
+      "required": ["decision"],
+      "properties": {
+        "decision": { "$ref": "#/$defs/ApprovalDecision" },
+        "comment": { "type": "string", "maxLength": 2000 }
+      }
+    },
+
+    "CreateExceptionRequest": {
+      "type": "object",
+      "required": ["scopeType", "scopeId", "reason"],
+      "properties": {
+        "scopeType": { "type": "string" },
+        "scopeId": { "type": "string" },
+        "reason": { "type": "string", "maxLength": 2000 },
+        "approvalRequestId": { "type": "string", "format": "uuid" },
+        "validUntil": { "type": "string", "format": "date-time" }
+      }
+    },
+
+    "CreateSignOffRequest": {
+      "type": "object",
+      "required": ["subjectType", "subjectId", "attestation"],
+      "properties": {
+        "subjectType": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "attestation": { "type": "string", "maxLength": 2000 }
+      }
+    },
+
+    "CollectEvidenceRequest": {
+      "type": "object",
+      "required": ["evidenceType", "refType", "refId"],
+      "properties": {
+        "evidenceType": { "$ref": "#/$defs/EvidenceType" },
+        "refType": { "type": "string" },
+        "refId": { "type": "string" },
+        "auditEventId": { "type": "string", "format": "uuid" },
+        "controlId": { "type": "string", "format": "uuid" },
+        "description": { "type": "string", "maxLength": 2000 },
+        "content": { "type": "object", "default": {} }
+      }
+    }
+  }
+}

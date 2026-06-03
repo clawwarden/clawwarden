@@ -1,0 +1,495 @@
+openapi: 3.1.0
+info:
+  title: AgentGuard Governance Service
+  version: 0.1.0
+  description: >
+    Cross-cutting trust fabric for the AI Trust Infrastructure Stack: policy
+    versioning, immutable audit chain, approvals/exceptions, reviewer sign-offs,
+    control mapping, and evidence packs. See ../MANIFESTO.md §7–§8.
+
+    Mounted at /v1/governance (stack clients, x-api-key) and /web/governance
+    (dashboard, JWT bearer). Tenant scoping is derived from the credential.
+
+servers:
+  - url: https://api.agentguard.dev
+    description: Production
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+
+tags:
+  - name: Audit
+  - name: Policy Versions
+  - name: Approvals
+  - name: Exceptions
+  - name: Sign-offs
+  - name: Controls
+  - name: Evidence
+
+paths:
+  /v1/governance/audit:
+    post:
+      tags: [Audit]
+      summary: Append an event to the immutable audit chain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AppendAuditEventRequest" }
+      responses:
+        "201":
+          description: Appended
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuditEvent" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    get:
+      tags: [Audit]
+      summary: List audit events (newest first)
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, default: 100, maximum: 500 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/AuditEvent" }
+
+  /v1/governance/audit/verify:
+    get:
+      tags: [Audit]
+      summary: Re-verify the tenant's audit chain integrity (tamper check)
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ChainVerification" }
+
+  /v1/governance/policies/{policyId}/versions:
+    get:
+      tags: [Policy Versions]
+      summary: List versions of a policy
+      parameters:
+        - { name: policyId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/PolicyVersion" }
+    post:
+      tags: [Policy Versions]
+      summary: Create a new draft version of a policy
+      parameters:
+        - { name: policyId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreatePolicyVersionRequest" }
+      responses:
+        "201":
+          description: Draft created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PolicyVersion" }
+
+  /v1/governance/policies/{policyId}/versions/{versionId}/activate:
+    post:
+      tags: [Policy Versions]
+      summary: Activate a version (supersedes the prior active one)
+      parameters:
+        - { name: policyId, in: path, required: true, schema: { type: string, format: uuid } }
+        - { name: versionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Activated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PolicyVersion" }
+
+  /v1/governance/approvals:
+    get:
+      tags: [Approvals]
+      summary: List approval requests
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: "#/components/schemas/ApprovalStatus" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ApprovalRequest" }
+    post:
+      tags: [Approvals]
+      summary: Create an approval request (requires authenticated user)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateApprovalRequest" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalRequest" }
+
+  /v1/governance/approvals/{requestId}:
+    get:
+      tags: [Approvals]
+      summary: Get an approval request
+      parameters:
+        - { name: requestId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /v1/governance/approvals/{requestId}/decisions:
+    post:
+      tags: [Approvals]
+      summary: Record a reviewer decision (SoD enforced; requester cannot approve)
+      parameters:
+        - { name: requestId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RecordDecisionRequest" }
+      responses:
+        "200":
+          description: Decision recorded; request state recomputed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApprovalRequest" }
+        "403":
+          description: Requester cannot approve their own request
+        "409":
+          description: Already decided or reviewer already voted
+
+  /v1/governance/exceptions:
+    get:
+      tags: [Exceptions]
+      summary: List active exceptions
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/GovernanceException" }
+    post:
+      tags: [Exceptions]
+      summary: Grant a time-boxed exception
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateExceptionRequest" }
+      responses:
+        "201":
+          description: Granted
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GovernanceException" }
+
+  /v1/governance/exceptions/{exceptionId}/revoke:
+    post:
+      tags: [Exceptions]
+      summary: Revoke an active exception
+      parameters:
+        - { name: exceptionId, in: path, required: true, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: Revoked
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GovernanceException" }
+
+  /v1/governance/sign-offs:
+    get:
+      tags: [Sign-offs]
+      summary: List sign-offs
+      parameters:
+        - { name: subjectType, in: query, schema: { type: string } }
+        - { name: subjectId, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/SignOff" }
+    post:
+      tags: [Sign-offs]
+      summary: Record a hash-stamped attestation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateSignOffRequest" }
+      responses:
+        "201":
+          description: Recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SignOff" }
+
+  /v1/governance/controls:
+    get:
+      tags: [Controls]
+      summary: List controls
+      parameters:
+        - name: framework
+          in: query
+          schema: { $ref: "#/components/schemas/ComplianceFramework" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Control" }
+
+  /v1/governance/controls/seed:
+    post:
+      tags: [Controls]
+      summary: Seed the starter control catalog (idempotent)
+      responses:
+        "201":
+          description: Seeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inserted: { type: integer }
+
+  /v1/governance/controls/coverage:
+    get:
+      tags: [Controls]
+      summary: Control implementation coverage by framework
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/ControlCoverage" }
+
+  /v1/governance/controls/{controlId}:
+    patch:
+      tags: [Controls]
+      summary: Update a control's implementation status
+      parameters:
+        - { name: controlId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { $ref: "#/components/schemas/ControlStatus" }
+                ownerUserId: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Control" }
+
+  /v1/governance/controls/{controlId}/mappings:
+    post:
+      tags: [Controls]
+      summary: Map a control to a governance object (policy/agent/risk_domain)
+      parameters:
+        - { name: controlId, in: path, required: true, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mappedType, mappedId]
+              properties:
+                mappedType: { type: string }
+                mappedId: { type: string }
+      responses:
+        "201":
+          description: Mapped
+
+  /v1/governance/evidence:
+    get:
+      tags: [Evidence]
+      summary: List evidence
+      parameters:
+        - { name: controlId, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Evidence" }
+    post:
+      tags: [Evidence]
+      summary: Collect an evidence artifact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CollectEvidenceRequest" }
+      responses:
+        "201":
+          description: Collected
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Evidence" }
+
+  /v1/governance/evidence/pack:
+    get:
+      tags: [Evidence]
+      summary: Build a regulator-facing evidence pack for a date range
+      parameters:
+        - { name: from, in: query, required: true, schema: { type: string, format: date-time } }
+        - { name: to, in: query, required: true, schema: { type: string, format: date-time } }
+      responses:
+        "200":
+          description: Evidence pack (integrity-verified)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/EvidencePack" }
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    Unauthorized:
+      description: Missing or invalid credential
+    NotFound:
+      description: Resource not found
+  schemas:
+    # Entity + request schemas mirror schemas/governance.schema.json $defs.
+    ApprovalStatus:
+      type: string
+      enum: [pending, approved, denied, expired, cancelled]
+    ComplianceFramework:
+      type: string
+      enum: [nist_ai_rmf, sr_11_7, soc2, iso_42001, iso_27001, eu_ai_act]
+    ControlStatus:
+      type: string
+      enum: [not_implemented, in_progress, implemented, not_applicable]
+    AuditEvent:
+      $ref: "./schemas/governance.schema.json#/$defs/AuditEvent"
+    ChainVerification:
+      $ref: "./schemas/governance.schema.json#/$defs/ChainVerification"
+    PolicyVersion:
+      $ref: "./schemas/governance.schema.json#/$defs/PolicyVersion"
+    ApprovalRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/ApprovalRequest"
+    GovernanceException:
+      $ref: "./schemas/governance.schema.json#/$defs/GovernanceException"
+    SignOff:
+      $ref: "./schemas/governance.schema.json#/$defs/SignOff"
+    Control:
+      $ref: "./schemas/governance.schema.json#/$defs/Control"
+    Evidence:
+      $ref: "./schemas/governance.schema.json#/$defs/Evidence"
+    AppendAuditEventRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/AppendAuditEventRequest"
+    CreatePolicyVersionRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/CreatePolicyVersionRequest"
+    CreateApprovalRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/CreateApprovalRequest"
+    RecordDecisionRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/RecordDecisionRequest"
+    CreateExceptionRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/CreateExceptionRequest"
+    CreateSignOffRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/CreateSignOffRequest"
+    CollectEvidenceRequest:
+      $ref: "./schemas/governance.schema.json#/$defs/CollectEvidenceRequest"
+    ControlCoverage:
+      type: object
+      properties:
+        framework: { $ref: "#/components/schemas/ComplianceFramework" }
+        total: { type: integer }
+        implemented: { type: integer }
+        inProgress: { type: integer }
+        notImplemented: { type: integer }
+        notApplicable: { type: integer }
+        coverageRatio: { type: number }
+    EvidencePack:
+      type: object
+      properties:
+        tenantId: { type: string, format: uuid }
+        generatedAt: { type: string, format: date-time }
+        range:
+          type: object
+          properties:
+            from: { type: string, format: date-time }
+            to: { type: string, format: date-time }
+        chainIntegrity: { $ref: "#/components/schemas/ChainVerification" }
+        controlCoverage:
+          type: array
+          items: { $ref: "#/components/schemas/ControlCoverage" }
+        auditEventCount: { type: integer }
+        auditEvents:
+          type: array
+          items: { $ref: "#/components/schemas/AuditEvent" }
+        evidence:
+          type: array
+          items: { $ref: "#/components/schemas/Evidence" }

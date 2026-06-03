@@ -1,0 +1,23 @@
+{
+  "name": "@vaultex/finsafe-core",
+  "version": "0.1.0",
+  "description": "Runtime AI-safety detectors — prompt injection, PII leakage, jailbreak. Open interfaces + reference heuristics; tuned detectors plug in behind the same interface.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "keywords": ["llm", "ai-safety", "prompt-injection", "jailbreak", "pii", "owasp-llm"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --pool=forks"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
