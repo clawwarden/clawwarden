@@ -2,9 +2,8 @@
 
 Data-sensitivity classification + Governance Service client for the Vaultex stack.
 
-```bash
-pip install vaultex
-```
+> Pre-release: not yet on PyPI. Install from source:
+> `git clone https://github.com/sammy995/vaultex && pip install -e packages/classifier`
 
 ## Classify before you send to an LLM
 

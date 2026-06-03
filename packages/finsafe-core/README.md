@@ -2,9 +2,8 @@
 
 Runtime AI-safety detectors for the OWASP LLM Top 10 — **open interfaces + reference heuristics**.
 
-```bash
-npm install @vaultex/finsafe-core
-```
+> Pre-release: not yet on npm. Install from source: `git clone` the repo, then
+> `npm install && npm run build` and import from this workspace package.
 
 ```ts
 import { DetectorRegistry, referenceDetectors, assessRisk } from '@vaultex/finsafe-core';

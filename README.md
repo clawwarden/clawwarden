@@ -35,9 +35,14 @@ internals) plugs in behind these interfaces. See [Open-core](#-open-core).
 
 ## 🚀 Quickstart
 
+> **Release status:** pre-1.0. Packages are **not yet on npm / PyPI** — install from
+> source (below). Registry publishing is tracked in the issues.
+
 ```bash
 # 1. Classify + tokenize sensitive data before it leaves your network (Python)
-pip install vaultex
+# From source (until PyPI publish):
+git clone https://github.com/sammy995/vaultex && cd vaultex
+pip install -e packages/classifier
 ```
 ```python
 from vaultex import Classifier, RegexNerPipeline
@@ -50,7 +55,9 @@ print(result.entities)           # -> [PERSON, SSN, MONEY...]
 
 ```bash
 # 2. Screen model I/O for runtime attacks (TypeScript)
-npm install @vaultex/finsafe-core
+# From source (until npm publish): npm install && npm run build, then import
+# from the @vaultex/finsafe-core workspace package.
+npm install && npm run build
 ```
 ```ts
 import { DetectorRegistry, referenceDetectors } from '@vaultex/finsafe-core';
