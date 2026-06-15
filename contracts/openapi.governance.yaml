@@ -1,17 +1,17 @@
 openapi: 3.1.0
 info:
-  title: AgentGuard Governance Service
+  title: Vaultex Governance Service
   version: 0.1.0
   description: >
-    Cross-cutting trust fabric for the AI Trust Infrastructure Stack: policy
+    Cross-cutting trust fabric for the Vaultex AI Trust Infrastructure: policy
     versioning, immutable audit chain, approvals/exceptions, reviewer sign-offs,
-    control mapping, and evidence packs. See ../MANIFESTO.md §7–§8.
+    control mapping, and evidence packs. See ../docs/architecture.md.
 
     Mounted at /v1/governance (stack clients, x-api-key) and /web/governance
     (dashboard, JWT bearer). Tenant scoping is derived from the credential.
 
 servers:
-  - url: https://api.agentguard.dev
+  - url: https://api.vaultex.space
     description: Production
 
 security:

@@ -7,7 +7,11 @@
  */
 
 export * from './types.js';
-export { DetectorRegistry } from './registry.js';
+export {
+  DetectorRegistry,
+  DEFAULT_MAX_SCAN_LENGTH,
+  type DetectorRegistryOptions,
+} from './registry.js';
 export { assessRisk, type RiskAssessment } from './score.js';
 export { InjectionDetector } from './detectors/injection.js';
 export { PiiLeakageDetector } from './detectors/pii-leakage.js';

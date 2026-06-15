@@ -9,6 +9,18 @@ export interface AgentGuardClientOptions {
   baseUrl: string;
   apiKey: string;
   fetchImpl?: typeof fetch;
+  /** Per-request timeout in ms. Default 5000. */
+  timeoutMs?: number;
+  /** Retries for transient failures (network / 5xx) on writes. Default 2. */
+  maxRetries?: number;
+  /** Base backoff in ms (doubled per attempt). Default 200. */
+  retryBackoffMs?: number;
+  /**
+   * Called when a write (recordCall / appendAuditEvent) is abandoned after
+   * exhausting retries. Audit/cost data are records — buffer them here (disk,
+   * queue, DLQ) instead of losing them silently.
+   */
+  onDrop?: (path: string, body: unknown, error: unknown) => void;
 }
 
 export interface RecordCallInput {
@@ -60,45 +72,103 @@ export class VaultexApiError extends Error {
   }
 }
 
+const isRetryableStatus = (status: number): boolean =>
+  status === 408 || status === 429 || status >= 500;
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
 export class AgentGuardClient {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly fetchImpl: typeof fetch;
+  private readonly timeoutMs: number;
+  private readonly maxRetries: number;
+  private readonly retryBackoffMs: number;
+  private readonly onDrop?: AgentGuardClientOptions['onDrop'];
 
   constructor(opts: AgentGuardClientOptions) {
     this.baseUrl = opts.baseUrl.replace(/\/$/, '');
     this.apiKey = opts.apiKey;
     this.fetchImpl = opts.fetchImpl ?? fetch;
+    this.timeoutMs = opts.timeoutMs ?? 5000;
+    this.maxRetries = Math.max(0, opts.maxRetries ?? 2);
+    this.retryBackoffMs = Math.max(0, opts.retryBackoffMs ?? 200);
+    this.onDrop = opts.onDrop;
   }
 
-  private async request<T>(
+  /** Single attempt with a timeout. Reads the error body into the thrown error. */
+  private async attempt<T>(
     method: string,
     path: string,
-    body?: unknown,
+    body: unknown,
+    idempotencyKey?: string,
   ): Promise<T> {
-    const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
-      method,
-      headers: {
-        'x-api-key': this.apiKey,
-        ...(body ? { 'Content-Type': 'application/json' } : {}),
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    if (!res.ok) {
-      throw new VaultexApiError(`${method} ${path} failed`, res.status);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
+        method,
+        headers: {
+          'x-api-key': this.apiKey,
+          ...(body ? { 'Content-Type': 'application/json' } : {}),
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
+      });
+      if (!res.ok) {
+        const detail = await res.text().catch(() => '');
+        throw new VaultexApiError(
+          `${method} ${path} failed (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ''}`,
+          res.status,
+        );
+      }
+      if (res.status === 204) return undefined as T;
+      return (await res.json()) as T;
+    } finally {
+      clearTimeout(timer);
     }
-    if (res.status === 204) return undefined as T;
-    return (await res.json()) as T;
+  }
+
+  /** Read request — single attempt, no retry. */
+  private request<T>(method: string, path: string, body?: unknown): Promise<T> {
+    return this.attempt<T>(method, path, body);
+  }
+
+  /**
+   * Write request — retried on transient failure with a stable idempotency key
+   * so a re-send is deduped server-side. After the last attempt the payload is
+   * handed to `onDrop` (if set) before the error propagates.
+   */
+  private async write<T>(path: string, body: unknown): Promise<T> {
+    const idempotencyKey =
+      globalThis.crypto?.randomUUID?.() ??
+      `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      try {
+        return await this.attempt<T>('POST', path, body, idempotencyKey);
+      } catch (err) {
+        lastError = err;
+        const retryable =
+          !(err instanceof VaultexApiError) || isRetryableStatus(err.status);
+        if (!retryable || attempt === this.maxRetries) break;
+        await sleep(this.retryBackoffMs * 2 ** attempt);
+      }
+    }
+    this.onDrop?.(path, body, lastError);
+    throw lastError;
   }
 
   /** Record a monitored AI call. */
   recordCall(input: RecordCallInput): Promise<{ id: string; cost: number }> {
-    return this.request('POST', '/v1/calls', input);
+    return this.write('/v1/calls', input);
   }
 
   /** Append an event to the immutable audit chain. */
   appendAuditEvent(input: AppendAuditInput): Promise<{ id: string; seq: number }> {
-    return this.request('POST', '/v1/governance/audit', input);
+    return this.write('/v1/governance/audit', input);
   }
 
   /** List recent audit events. */

@@ -15,8 +15,20 @@ export interface SyslogOptions {
 }
 
 /**
+ * Strip CR/LF and other control characters so attacker-controlled text (prompts,
+ * messages) cannot forge new syslog records or break field boundaries (log
+ * injection / forging). Control chars collapse to spaces; the field stays one line.
+ */
+function sanitizeLine(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  return value.replace(/[\x00-\x1f\x7f]/g, ' ');
+}
+
+/**
  * Format an event as RFC 5424 syslog. Pure — testable, no I/O.
  *   <PRI>1 TIMESTAMP HOSTNAME APP-NAME PROCID MSGID SD MSG
+ *
+ * `eventType` and `message` are sanitized — they often carry untrusted text.
  */
 export function formatSyslog(event: SiemEvent, opts: SyslogOptions = {}): string {
   const facility = opts.facility ?? 16;
@@ -26,13 +38,20 @@ export function formatSyslog(event: SiemEvent, opts: SyslogOptions = {}): string
   const host = opts.hostname ?? '-';
   const app = opts.appName ?? 'vaultex';
   const sd = formatStructuredData(event.attributes);
-  return `<${pri}>1 ${ts} ${host} ${app} - ${event.eventType} ${sd} ${event.message}`;
+  const eventType = sanitizeLine(event.eventType);
+  const message = sanitizeLine(event.message);
+  return `<${pri}>1 ${ts} ${host} ${app} - ${eventType} ${sd} ${message}`;
 }
 
 function formatStructuredData(attrs?: Record<string, unknown>): string {
   if (!attrs || Object.keys(attrs).length === 0) return '-';
   const pairs = Object.entries(attrs)
-    .map(([k, v]) => `${k}="${String(v).replace(/(["\\\]])/g, '\\$1')}"`)
+    .map(([k, v]) => {
+      // SD-NAME forbids '=', ' ', ']', '"'; param values escape '"', '\', ']'.
+      const key = sanitizeLine(k).replace(/[=\]" ]/g, '_');
+      const val = sanitizeLine(String(v)).replace(/(["\\\]])/g, '\\$1');
+      return `${key}="${val}"`;
+    })
     .join(' ');
   return `[vaultex@0 ${pairs}]`;
 }

@@ -79,16 +79,15 @@ class RegexNerPipeline:
     def classify(self, text: str) -> ClassificationResult:
         entities: list[Entity] = []
         tags: list[str] = []
-        sensitivity = DataSensitivity.PUBLIC
+        levels: list[DataSensitivity] = []
         for etype, pattern, esev in _PATTERNS:
             for m in pattern.finditer(text):
                 entities.append(Entity(type=etype, start=m.start(), end=m.end()))
-                if _ORDER[esev] > _ORDER[sensitivity]:
-                    sensitivity = esev
+                levels.append(esev)
                 if etype not in tags:
                     tags.append(etype)
         return ClassificationResult(
-            sensitivity=sensitivity, entities=entities, tags=tags
+            sensitivity=max_sensitivity(levels), entities=entities, tags=tags
         )
 
 

@@ -9,6 +9,7 @@ import {
   buildOtlpConfig,
   discoveryUrl,
   buildAuthorizationUrl,
+  createPkcePair,
 } from './index.js';
 
 const TS = new Date('2026-06-02T12:00:00.000Z');
@@ -32,6 +33,17 @@ describe('SIEM formatting', () => {
       attributes: { role: 'admin', count: 3 },
     });
     expect(line).toContain('[vaultex@0 role="admin" count="3"]');
+  });
+
+  it('strips CR/LF from eventType and message (log injection)', () => {
+    const line = formatSyslog({
+      eventType: 'auth\nfailure',
+      message: 'ok\r\n<999>1 forged record here',
+      timestamp: TS,
+    });
+    expect(line.split('\n')).toHaveLength(1);
+    expect(line).not.toContain('\r');
+    expect(line).toContain('forged record here'); // neutralized, kept on one line
   });
 
   it('formats a Splunk HEC envelope', () => {
@@ -122,5 +134,23 @@ describe('OIDC helpers', () => {
     expect(url.searchParams.get('state')).toBe('state123');
     expect(url.searchParams.get('nonce')).toBe('n1');
     expect(url.searchParams.get('scope')).toBe('openid profile email');
+  });
+
+  it('adds PKCE params when a code challenge is supplied', async () => {
+    const pkce = await createPkcePair();
+    expect(pkce.method).toBe('S256');
+    expect(pkce.verifier.length).toBeGreaterThanOrEqual(43);
+    expect(pkce.challenge).not.toMatch(/[+/=]/); // base64url, no padding
+
+    const url = new URL(
+      buildAuthorizationUrl(
+        'https://issuer.example.com/authorize',
+        { issuer: 'https://issuer.example.com', clientId: 'cid', redirectUri: 'https://app/cb' },
+        'state123',
+        { codeChallenge: pkce.challenge },
+      ),
+    );
+    expect(url.searchParams.get('code_challenge')).toBe(pkce.challenge);
+    expect(url.searchParams.get('code_challenge_method')).toBe('S256');
   });
 });

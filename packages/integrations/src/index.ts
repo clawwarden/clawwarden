@@ -27,6 +27,8 @@ export {
 export {
   discoveryUrl,
   buildAuthorizationUrl,
+  createPkcePair,
   type OidcConfig,
   type AuthUrlOptions,
+  type PkcePair,
 } from './oidc.js';

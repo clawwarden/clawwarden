@@ -68,4 +68,58 @@ describe('AgentGuardClient', () => {
     });
     await expect(client.getAuditEvents()).rejects.toBeInstanceOf(VaultexApiError);
   });
+
+  it('sends a stable idempotency key on writes', async () => {
+    const cap: Record<string, unknown> = {};
+    const client = new AgentGuardClient({
+      baseUrl: 'https://api.test',
+      apiKey: 'k',
+      fetchImpl: (async (_url: unknown, init?: RequestInit) => {
+        cap.key = (init?.headers as Record<string, string>)['Idempotency-Key'];
+        return new Response(JSON.stringify({ id: 'e1', seq: 1 }), { status: 201 });
+      }) as unknown as typeof fetch,
+    });
+    await client.appendAuditEvent({ eventType: 'x' });
+    expect(typeof cap.key).toBe('string');
+    expect((cap.key as string).length).toBeGreaterThan(0);
+  });
+
+  it('retries a 5xx write then hands the payload to onDrop on exhaustion', async () => {
+    let calls = 0;
+    const dropped: Array<{ path: string }> = [];
+    const client = new AgentGuardClient({
+      baseUrl: 'https://api.test',
+      apiKey: 'k',
+      maxRetries: 2,
+      retryBackoffMs: 0,
+      onDrop: (path) => dropped.push({ path }),
+      fetchImpl: (async () => {
+        calls++;
+        return new Response('upstream down', { status: 503 });
+      }) as unknown as typeof fetch,
+    });
+
+    await expect(client.recordCall({
+      agentId: 'a', taskId: 't', model: 'm', provider: 'p',
+      inputTokens: 1, outputTokens: 1, latencyMs: 1,
+    })).rejects.toBeInstanceOf(VaultexApiError);
+
+    expect(calls).toBe(3); // 1 initial + 2 retries
+    expect(dropped).toEqual([{ path: '/v1/calls' }]);
+  });
+
+  it('aborts a request that exceeds the timeout', async () => {
+    const client = new AgentGuardClient({
+      baseUrl: 'https://api.test',
+      apiKey: 'k',
+      timeoutMs: 10,
+      fetchImpl: ((_url: unknown, init?: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () =>
+            reject(new DOMException('aborted', 'AbortError')),
+          );
+        })) as unknown as typeof fetch,
+    });
+    await expect(client.verifyChain()).rejects.toThrow(/abort/i);
+  });
 });
