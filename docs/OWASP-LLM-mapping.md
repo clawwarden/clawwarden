@@ -20,6 +20,25 @@ implemented controls are claimed; partial/out-of-scope items say so plainly.
 | **LLM09 — Overreliance** | Supporting — the tamper-evident audit chain ([audit.py](../apps/gateway/gateway/audit.py)) gives a verifiable record of every request/decision for human review. |
 | **LLM03, LLM05, LLM10** (training-data poisoning, supply chain, model theft) | Out of scope — these concern model training/hosting, not the inference-time trust layer Vaultex provides. |
 
+## Measured detection quality (LLM06)
+
+The PII detector is evaluated against a labeled corpus — see the harness
+([apps/gateway/eval/](../apps/gateway/eval/)) and the latest report
+([docs/eval/pii-eval-report.md](./eval/pii-eval-report.md)). Headline result on
+the current corpus (full Presidio + spaCy NER pipeline):
+
+- **Residual-leak rate: 0%** — no labeled PII value survived tokenization (the
+  product SLO: "PII never reaches the model").
+- **Micro recall: 100%**, with PERSON / SSN / EMAIL / PHONE / CARD / ACCOUNT /
+  ROUTING all at 100%.
+- The regex-only layer leaks **25%** by comparison (misses PERSON + DATE),
+  which is why the NER pipeline is the default.
+- Known weak spot: **DATE_TIME precision** (NER over-tags temporal words) — an
+  over-redaction, not a leak; tracked for tuning.
+
+Regenerate with `python -m eval.run_eval --mode both` (from `apps/gateway`); the
+weekly **PII detection eval** workflow reruns it and uploads the report.
+
 ## Design notes
 
 - **Fail-safe:** if PII detection errors, the request is **blocked** (HTTP 422), never sent in the clear.
