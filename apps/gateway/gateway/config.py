@@ -73,6 +73,13 @@ class Settings(BaseSettings):
     # (169.254.x) is ALWAYS blocked. See gateway/ssrf.py.
     ollama_url_allowlist: str = ""
 
+    # OWASP LLM01: block a chat request when the worst prompt-injection finding
+    # is at/above this severity (low|medium|high|critical). Default "high" so
+    # benign mentions don't block, but override-instruction / jailbreak / safety-
+    # bypass attempts are refused. Set "critical" to only block the most severe,
+    # or "low" to block on any signal.
+    injection_block_severity: str = "high"
+
     class Config:
         env_file = ".env"
         extra = "allow"

@@ -89,6 +89,8 @@ class EventType:
     LLM_CALL = "llm_call"
     ADMIN_ACCESS = "admin_access"
     RATE_LIMIT = "rate_limit"
+    INJECTION_DETECTED = "injection_detected"  # OWASP LLM01
+    OUTPUT_FLAGGED = "output_flagged"          # OWASP LLM02
 
 
 class AuditLogger:

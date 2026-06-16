@@ -30,6 +30,9 @@ from gateway.models import (
     UserResponse,
 )
 from gateway.rbac import PRIVILEGED_ROLES, get_role_permissions
+from gateway.injection_guard import scan_for_injection
+from gateway.log_scrubber import scrub_processor
+from gateway.output_guard import sanitize_output
 from gateway.redis_store import SessionStore
 from gateway.revocation import is_revoked
 from gateway.ssrf import SsrfBlocked, validate_ollama_url
@@ -41,6 +44,8 @@ structlog.configure(
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(fmt="iso"),
+        # OWASP LLM06: scrub secrets/PII from every log event before it is rendered.
+        scrub_processor,
         structlog.processors.JSONRenderer(),
     ],
     wrapper_class=structlog.stdlib.BoundLogger,
@@ -474,6 +479,48 @@ async def chat_completions(
             403, "This session does not belong to the authenticated caller."
         )
 
+    # 2.5 OWASP LLM01 — prompt-injection input guard. Inspect raw user content
+    # before it is tokenized/forwarded. Block at/above the configured severity;
+    # otherwise record the signal and proceed. (System messages are not scanned
+    # — the gateway controls the analyst system prompt itself.)
+    injection_labels: list[str] = []
+    worst_injection: str | None = None
+    for msg in body.messages:
+        if msg.role != "user":
+            continue
+        result = scan_for_injection(msg.content)
+        if result.findings:
+            injection_labels = sorted(set(injection_labels) | set(result.labels))
+            if worst_injection is None or (
+                result.worst_severity
+                and result.worst_severity != worst_injection
+            ):
+                worst_injection = result.worst_severity
+            if result.blocks_at(settings.injection_block_severity):
+                await audit_log.log_event(
+                    EventType.INJECTION_DETECTED,
+                    correlation_id,
+                    session_id=x_session_id,
+                    role=role,
+                    tenant_id=tenant,
+                    details={"action": "blocked", "labels": result.labels,
+                             "severity": result.worst_severity},
+                )
+                raise HTTPException(
+                    422,
+                    "Prompt-injection attempt detected — request blocked (OWASP LLM01).",
+                )
+    if injection_labels:
+        await audit_log.log_event(
+            EventType.INJECTION_DETECTED,
+            correlation_id,
+            session_id=x_session_id,
+            role=role,
+            tenant_id=tenant,
+            details={"action": "flagged", "labels": injection_labels,
+                     "severity": worst_injection},
+        )
+
     # 3. Tokenize all messages — FAIL SAFE: any error blocks the request
     tokenized_messages = []
     all_entities = []
@@ -530,6 +577,21 @@ async def chat_completions(
     token_map = await store.get_token_map(x_session_id)
     detokenized = run_detokenize(llm_response, token_map, allowed_entities)
 
+    # 6. OWASP LLM02 — Insecure Output Handling. Sanitize the model output before
+    # it is returned or passed to any downstream consumer (strip active markup,
+    # defang script/data URIs, remove markdown image beacons). Audit if it fired.
+    output_scan = sanitize_output(detokenized)
+    detokenized = output_scan.text
+    if output_scan.modified:
+        await audit_log.log_event(
+            EventType.OUTPUT_FLAGGED,
+            correlation_id,
+            session_id=x_session_id,
+            role=role,
+            tenant_id=tenant,
+            details={"flags": output_scan.flags},
+        )
+
     await audit_log.log_event(
         EventType.CHAT_REQUEST,
         correlation_id,
@@ -574,6 +636,8 @@ async def chat_completions(
                 "role": role,
                 "entities_allowed": list(allowed_entities),
                 "raw_llm_response": raw_llm_response,
+                # OWASP LLM02: rule labels that fired while sanitizing output (if any).
+                "output_flags": output_scan.flags,
                 # Map the token's short code (e.g. ACCT) to its canonical entity
                 # type (ACCOUNT_NUMBER) before the permission check, so the vault
                 # exposes exactly what the role's detokenized text already shows —

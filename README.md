@@ -93,6 +93,19 @@ docker-compose.yml   redis + gateway (one command)
 - **Web** (`apps/web`): standalone Next.js app; `npm install && npm run build`. Deploys on Vercel
   with the **project root set to `apps/web`**.
 
+## 🛡 OWASP Top 10 for LLMs
+
+Vaultex's runtime controls map directly to the OWASP Top 10 for LLM Applications.
+Full mapping (control → file → test): [docs/OWASP-LLM-mapping.md](./docs/OWASP-LLM-mapping.md).
+
+| OWASP risk | Vaultex control |
+|---|---|
+| **LLM01 — Prompt Injection** | Runtime input guardrail inspects every user message and blocks instruction-override / jailbreak / prompt-extraction at a configurable severity, before tokenize/forward. |
+| **LLM02 — Insecure Output Handling** | Output sanitizer defangs script/iframe, `javascript:`/`data:` URIs, and markdown image beacons before the response is returned or passed downstream. |
+| **LLM06 — Sensitive Information Disclosure** | Reversible PII tokenization (model never sees raw PII) + role-aware detokenization + entropy/regex log scrubber that redacts secrets before any log is emitted. |
+
+All three fire tamper-evident audit events; heuristics are an open reference baseline.
+
 ## 🔓 Open-core
 
 Vaultex is **open-core** (Apache-2.0). This repo is everything you need to run, integrate, and extend
