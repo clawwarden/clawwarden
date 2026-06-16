@@ -106,6 +106,8 @@ Full mapping (control → file → test): [docs/OWASP-LLM-mapping.md](./docs/OWA
 
 All three fire tamper-evident audit events; heuristics are an open reference baseline.
 
+**Measured:** on the labeled eval corpus the NER pipeline detects PII at **100% micro-recall with a 0% residual-leak rate** (no PII value survives tokenization). Harness: [apps/gateway/eval/](./apps/gateway/eval/) · report: [docs/eval/pii-eval-report.md](./docs/eval/pii-eval-report.md).
+
 ## 🔓 Open-core
 
 Vaultex is **open-core** (Apache-2.0). This repo is everything you need to run, integrate, and extend

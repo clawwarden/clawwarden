@@ -145,6 +145,38 @@ def _stable_hash(session_id: str, entity_type: str, value: str) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
+@dataclass
+class DetectedSpan:
+    entity_type: str
+    start: int
+    end: int
+    score: float
+
+
+def analyze_spans(text: str, score_threshold: float = 0.4) -> List[DetectedSpan]:
+    """Detect PII spans with the production analyzer + overlap dedup (sync).
+
+    This is the single source of truth for *what counts as PII* — both
+    ``run_tokenize`` and the offline eval harness call it, so measured recall is
+    the recall of the real pipeline. Returns spans sorted by start (descending),
+    ready for right-to-left replacement.
+    """
+    analyzer = get_analyzer()
+    results = analyzer.analyze(
+        text=text, language="en", entities=ALL_ENTITIES, score_threshold=score_threshold
+    )
+    # Remove overlapping spans (keep highest-score).
+    deduped = []
+    covered: set[int] = set()
+    for r in sorted(results, key=lambda r: r.score, reverse=True):
+        span = set(range(r.start, r.end))
+        if not span & covered:
+            deduped.append(r)
+            covered |= span
+    deduped.sort(key=lambda r: r.start, reverse=True)
+    return [DetectedSpan(r.entity_type, r.start, r.end, r.score) for r in deduped]
+
+
 async def run_tokenize(
     text: str,
     session_id: str,
@@ -157,35 +189,12 @@ async def run_tokenize(
         entity_results: list of what was found
         new_token_map: {token -> real_value} — must be merged into session store
     """
-    analyzer = get_analyzer()
-
     # DB7: Presidio + spaCy NER is CPU-bound work. Running it synchronously inside
     # an async handler blocks the event loop for the full NER duration, serialising
     # every concurrent request behind spaCy. run_in_executor offloads to the default
     # ThreadPoolExecutor so the loop remains free for I/O while NER runs.
     loop = asyncio.get_event_loop()
-    results = await loop.run_in_executor(
-        None,
-        lambda: analyzer.analyze(
-            text=text,
-            language="en",
-            entities=ALL_ENTITIES,
-            score_threshold=0.4,
-        ),
-    )
-
-    # Sort descending by start so right-to-left replacement keeps offsets valid
-    results = sorted(results, key=lambda r: r.start, reverse=True)
-
-    # Remove overlapping spans (keep highest-score)
-    deduped = []
-    covered: set[int] = set()
-    for r in sorted(results, key=lambda r: r.score, reverse=True):
-        span = set(range(r.start, r.end))
-        if not span & covered:
-            deduped.append(r)
-            covered |= span
-    deduped.sort(key=lambda r: r.start, reverse=True)
+    deduped = await loop.run_in_executor(None, lambda: analyze_spans(text))
 
     entity_results: List[EntityResult] = []
     new_token_map: Dict[str, str] = {}

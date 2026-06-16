@@ -1,0 +1,102 @@
+{
+  "examples": 36,
+  "per_type": {
+    "ACCOUNT_NUMBER": {
+      "precision": 0.7142857142857143,
+      "recall": 1.0,
+      "f1": 0.8333333333333333,
+      "tp": 5,
+      "fp": 2,
+      "fn": 0
+    },
+    "CREDIT_CARD": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "DATE_TIME": {
+      "precision": 1.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2
+    },
+    "EMAIL_ADDRESS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "LOAN_ID": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6666666666666666,
+      "tp": 3,
+      "fp": 3,
+      "fn": 0
+    },
+    "PERSON": {
+      "precision": 1.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 6
+    },
+    "PHONE_NUMBER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "ROUTING_NUMBER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "SSN": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "micro": {
+    "precision": 0.8275862068965517,
+    "recall": 0.75,
+    "f1": 0.7868852459016394
+  },
+  "macro": {
+    "precision": 0.9126984126984127,
+    "recall": 0.7777777777777778
+  },
+  "residual_leak": {
+    "values": 32,
+    "leaked": 8,
+    "rate": 0.25
+  },
+  "latency_ms": {
+    "mean": 0.008077775419224054,
+    "p50": 0.007700000423938036,
+    "p95": 0.013300013961270452
+  },
+  "false_positive_examples": [
+    {
+      "text": "Loan-to-value ratio is 0.82.",
+      "type": "LOAN_ID"
+    }
+  ]
+}

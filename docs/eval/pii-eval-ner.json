@@ -1,0 +1,122 @@
+{
+  "examples": 36,
+  "per_type": {
+    "ACCOUNT_NUMBER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0
+    },
+    "CREDIT_CARD": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "DATE_TIME": {
+      "precision": 0.25,
+      "recall": 1.0,
+      "f1": 0.4,
+      "tp": 2,
+      "fp": 6,
+      "fn": 0
+    },
+    "EMAIL_ADDRESS": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "LOAN_ID": {
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.8571428571428571,
+      "tp": 3,
+      "fp": 1,
+      "fn": 0
+    },
+    "PERSON": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 6,
+      "fp": 0,
+      "fn": 0
+    },
+    "PHONE_NUMBER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "ROUTING_NUMBER": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    "SSN": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "tp": 4,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "micro": {
+    "precision": 0.8205128205128205,
+    "recall": 1.0,
+    "f1": 0.9014084507042254
+  },
+  "macro": {
+    "precision": 0.8888888888888888,
+    "recall": 1.0
+  },
+  "residual_leak": {
+    "values": 32,
+    "leaked": 0,
+    "rate": 0.0
+  },
+  "latency_ms": {
+    "mean": 4.015497227859062,
+    "p50": 2.8144999960204586,
+    "p95": 14.814699999988079
+  },
+  "false_positive_examples": [
+    {
+      "text": "Days past due: 30.",
+      "type": "DATE_TIME"
+    },
+    {
+      "text": "Credit score improved to 742 this quarter.",
+      "type": "DATE_TIME"
+    },
+    {
+      "text": "Monthly payment of 1,250 dollars.",
+      "type": "DATE_TIME"
+    },
+    {
+      "text": "Loan-to-value ratio is 0.82.",
+      "type": "LOAN_ID"
+    },
+    {
+      "text": "Portfolio grew four percent year over year.",
+      "type": "DATE_TIME"
+    },
+    {
+      "text": "Term length is 360 months.",
+      "type": "DATE_TIME"
+    }
+  ]
+}
