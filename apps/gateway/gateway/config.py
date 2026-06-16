@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     # (169.254.x) is ALWAYS blocked. See gateway/ssrf.py.
     ollama_url_allowlist: str = ""
 
+    # Error tracking (Sentry) — opt-in. Empty DSN = disabled (no-op). PII is
+    # never sent (send_default_pii=False + scrubbing); see gateway/observability.py.
+    sentry_dsn: str = ""
+    sentry_traces_sample_rate: float = 0.0
+
     # OWASP LLM01: block a chat request when the worst prompt-injection finding
     # is at/above this severity (low|medium|high|critical). Default "high" so
     # benign mentions don't block, but override-instruction / jailbreak / safety-

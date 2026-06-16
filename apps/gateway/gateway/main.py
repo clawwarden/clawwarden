@@ -32,6 +32,7 @@ from gateway.models import (
 from gateway.rbac import PRIVILEGED_ROLES, get_role_permissions
 from gateway.injection_guard import scan_for_injection
 from gateway.log_scrubber import scrub_processor
+from gateway.observability import init_sentry
 from gateway.output_guard import sanitize_output
 from gateway.redis_store import SessionStore
 from gateway.revocation import is_revoked
@@ -52,6 +53,9 @@ structlog.configure(
     logger_factory=structlog.stdlib.LoggerFactory(),
 )
 log = structlog.get_logger()
+
+# Initialise error tracking as early as possible (no-op unless SENTRY_DSN is set).
+init_sentry()
 
 store: SessionStore | None = None
 audit_log: AuditLogger | None = None
