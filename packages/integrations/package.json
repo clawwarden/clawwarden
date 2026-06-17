@@ -1,5 +1,5 @@
 {
-  "name": "@clawwarden/integrations",
+  "name": "clawwarden-integrations",
   "version": "0.1.0",
   "description": "Observability & IAM adapters for the ClawWarden stack — OpenTelemetry, Prometheus, Datadog, SIEM (syslog/Splunk HEC), OIDC. Dependency-light.",
   "license": "Apache-2.0",

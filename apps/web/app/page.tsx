@@ -589,7 +589,7 @@ export default function LandingPage() {
 {`import {
   DetectorRegistry,
   referenceDetectors,
-} from '@clawwarden/finsafe-core';
+} from 'clawwarden-finsafe-core';
 
 const registry = new DetectorRegistry(
   referenceDetectors(),

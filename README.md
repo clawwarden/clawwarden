@@ -49,8 +49,8 @@ Classifier(pipeline=RegexNerPipeline()).classify(
 ```
 
 ```ts
-// npm i @clawwarden/finsafe-core
-import { DetectorRegistry, referenceDetectors } from '@clawwarden/finsafe-core';
+// npm i clawwarden-finsafe-core
+import { DetectorRegistry, referenceDetectors } from 'clawwarden-finsafe-core';
 const findings = await new DetectorRegistry(referenceDetectors()).scan({ phase: 'input', text });
 ```
 
@@ -90,7 +90,7 @@ packages/
   finsafe-core/ Detector interface + reference injection / PII-leak / jailbreak heuristics (TS)
   integrations/ OpenTelemetry · Prometheus · Datadog · SIEM · OIDC adapters                (TS)
   classifier/   Python pkg `clawwarden`: Classifier + regex/NER pipeline + governance client
-sdk/typescript/ Thin client (@clawwarden/sdk)
+sdk/typescript/ Thin client (clawwarden-sdk)
 contracts/      OpenAPI + JSON-Schema for the Governance Service
 docs/  examples/   docker-compose.yml
 ```

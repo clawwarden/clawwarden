@@ -1,14 +1,14 @@
-# @clawwarden/sdk
+# clawwarden-sdk
 
 Thin TypeScript client for AgentGuard runtime monitoring + the ClawWarden Governance Service.
 No runtime dependencies (uses the platform `fetch`).
 
 ```bash
-npm install @clawwarden/sdk
+npm install clawwarden-sdk
 ```
 
 ```ts
-import { AgentGuardClient } from '@clawwarden/sdk';
+import { AgentGuardClient } from 'clawwarden-sdk';
 
 const client = new AgentGuardClient({
   baseUrl: 'https://api.your-clawwarden.com',

@@ -4,7 +4,7 @@ Runnable quickstarts for the ClawWarden open packages.
 
 | File | Shows |
 |------|-------|
-| `finsafe-quickstart.mjs` | Screening prompts for injection / jailbreak with `@clawwarden/finsafe-core` |
+| `finsafe-quickstart.mjs` | Screening prompts for injection / jailbreak with `clawwarden-finsafe-core` |
 | `classify-quickstart.py` | Classifying data sensitivity with the `clawwarden` Python package |
 
 ## Run

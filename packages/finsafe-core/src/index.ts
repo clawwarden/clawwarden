@@ -1,5 +1,5 @@
 /**
- * @clawwarden/finsafe-core — runtime AI-safety detectors.
+ * clawwarden-finsafe-core — runtime AI-safety detectors.
  *
  * Open interfaces + reference heuristic detectors for OWASP LLM Top 10 risks.
  * a custom detectors implement the same `Detector` interface

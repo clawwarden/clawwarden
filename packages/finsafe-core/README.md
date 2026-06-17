@@ -1,4 +1,4 @@
-# @clawwarden/finsafe-core
+# clawwarden-finsafe-core
 
 Runtime AI-safety detectors for the OWASP LLM Top 10 — **open interfaces + reference heuristics**.
 
@@ -6,7 +6,7 @@ Runtime AI-safety detectors for the OWASP LLM Top 10 — **open interfaces + ref
 > `npm install && npm run build` and import from this workspace package.
 
 ```ts
-import { DetectorRegistry, referenceDetectors, assessRisk } from '@clawwarden/finsafe-core';
+import { DetectorRegistry, referenceDetectors, assessRisk } from 'clawwarden-finsafe-core';
 
 const registry = new DetectorRegistry(referenceDetectors());
 
@@ -35,7 +35,7 @@ guardrail today and a stable `Detector` interface to build on.
 ## Bring your own detector
 
 ```ts
-import type { Detector, Finding, ScanContext } from '@clawwarden/finsafe-core';
+import type { Detector, Finding, ScanContext } from 'clawwarden-finsafe-core';
 
 class MyDetector implements Detector {
   readonly id = 'acme.custom';

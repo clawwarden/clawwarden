@@ -1,5 +1,5 @@
 {
-  "name": "@clawwarden/finsafe-core",
+  "name": "clawwarden-finsafe-core",
   "version": "0.1.0",
   "description": "Runtime AI-safety detectors — prompt injection, PII leakage, jailbreak. Open interfaces + reference heuristics; tuned detectors plug in behind the same interface.",
   "license": "Apache-2.0",

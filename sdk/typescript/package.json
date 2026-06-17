@@ -1,5 +1,5 @@
 {
-  "name": "@clawwarden/sdk",
+  "name": "clawwarden-sdk",
   "version": "0.1.0",
   "description": "Thin TypeScript client for AgentGuard runtime monitoring + the ClawWarden Governance Service.",
   "license": "Apache-2.0",

@@ -1,5 +1,5 @@
 /**
- * @clawwarden/sdk — thin client for AgentGuard (runtime monitoring) and the
+ * clawwarden-sdk — thin client for AgentGuard (runtime monitoring) and the
  * ClawWarden Governance Service. Uses the platform `fetch`; no runtime deps.
  *
  * Authenticates with the `x-api-key` header (tenant is derived from the key).
