@@ -31,7 +31,12 @@ try:
 except Exception:
     pass
 
-from clawwarden import Classifier, RegexNerPipeline
+try:
+    from clawwarden import Classifier, RegexNerPipeline
+except ModuleNotFoundError:
+    sys.exit("\nClawWarden isn't installed in this interpreter.\n"
+             "  Run:  python -m pip install clawwarden\n"
+             "  Then: python demo/demo.py\n")
 
 # --- tiny ANSI helpers (no extra deps) -------------------------------------
 def c(s, code):  # color
