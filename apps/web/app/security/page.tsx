@@ -7,8 +7,8 @@ import SiteFooter from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Security",
   description:
-    "Vaultex security architecture: tokenization at the edge, tamper-evident audit chain, role-based disclosure, zero-trust tenant isolation, and enterprise deployment.",
-  alternates: { canonical: "https://vaultex.space/security" },
+    "ClawWarden security architecture: tokenization at the edge, tamper-evident audit chain, role-based disclosure, zero-trust tenant isolation, and enterprise deployment.",
+  alternates: { canonical: "https://clawwarden.space/security" },
 };
 
 const CONTROLS = [
@@ -37,7 +37,7 @@ export default function SecurityPage() {
             </h1>
             <p className="lede">
               Banks don't buy diagrams — they buy controls, isolation, auditability, and evidence.
-              Here's how Vaultex is constructed to earn a pilot.
+              Here's how ClawWarden is constructed to earn a pilot.
             </p>
           </div>
 
@@ -80,16 +80,16 @@ export default function SecurityPage() {
             <ShieldCheck size={20} color="var(--vault)" />
             <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", margin: 0 }}>
               Found a vulnerability? Read our{" "}
-              <a className="link-underline" href="https://github.com/sammy995/vaultex/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">
+              <a className="link-underline" href="https://github.com/clawwarden/clawwarden/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">
                 responsible-disclosure policy
               </a>{" "}
-              or email <a className="link-underline" href="mailto:security@vaultex.space">security@vaultex.space</a>.
+              or email <a className="link-underline" href="mailto:security@clawwarden.space">security@clawwarden.space</a>.
             </p>
           </div>
 
           <div style={{ marginTop: "40px", display: "flex", gap: "12px", flexWrap: "wrap", paddingBottom: "20px" }}>
             <Link href="/compliance" className="btn btn-ink">Compliance &amp; frameworks</Link>
-            <Link href="/pricing" className="btn btn-line">See plans</Link>
+            <Link href="/setup" className="btn btn-line">Get started</Link>
           </div>
         </div>
       </main>

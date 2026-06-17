@@ -14,15 +14,15 @@ import SiteFooter from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Trust Center",
   description:
-    "Vaultex Trust Center — security posture, data handling, audit integrity, compliance status, and responsible disclosure. Stated honestly.",
-  alternates: { canonical: "https://vaultex.space/trust" },
+    "ClawWarden Trust Center — security posture, data handling, audit integrity, compliance status, and responsible disclosure. Stated honestly.",
+  alternates: { canonical: "https://clawwarden.space/trust" },
 };
 
 const POSTURE = [
   {
     icon: Server,
     title: "Self-host = your data residency",
-    body: "Run the open-core engine inside your own perimeter. With local models, prompts and PII never leave your network — there is no Vaultex cloud in the path and nothing to trust us with.",
+    body: "Run the open source engine inside your own perimeter. With local models, prompts and PII never leave your network — there is no ClawWarden cloud in the path and nothing to trust us with.",
   },
   {
     icon: FileLock2,
@@ -135,7 +135,7 @@ export default function TrustPage() {
               Audit the source. Run it offline. Then decide.
             </h2>
             <div style={{ display: "flex", gap: "12px", marginTop: "26px", flexWrap: "wrap" }}>
-              <a href="https://github.com/sammy995/vaultex" target="_blank" rel="noopener noreferrer" className="btn" style={{ background: "var(--paper)", color: "var(--ink)" }}>
+              <a href="https://github.com/clawwarden/clawwarden" target="_blank" rel="noopener noreferrer" className="btn" style={{ background: "var(--paper)", color: "var(--ink)" }}>
                 Inspect the repository
               </a>
               <Link href="/security" className="btn" style={{ background: "transparent", color: "var(--paper)", border: "1px solid rgba(241,236,225,0.3)" }}>
@@ -150,9 +150,9 @@ export default function TrustPage() {
             <p style={{ fontSize: "0.95rem", color: "var(--ink-soft)", margin: 0, lineHeight: 1.6 }}>
               <strong style={{ color: "var(--ink)" }}>Responsible disclosure.</strong> Report
               vulnerabilities to{" "}
-              <a className="link-underline" href="mailto:security@vaultex.space">security@vaultex.space</a>{" "}
+              <a className="link-underline" href="mailto:security@clawwarden.space">security@clawwarden.space</a>{" "}
               or via{" "}
-              <a className="link-underline" href="https://github.com/sammy995/vaultex/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">
+              <a className="link-underline" href="https://github.com/clawwarden/clawwarden/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer">
                 SECURITY.md
               </a>. Enterprise evaluators: request our entity details, DPA, and architecture brief
               at <a className="link-underline" href="/contact">contact</a>.

@@ -1,7 +1,7 @@
 {
-  "name": "@vaultex/sdk",
+  "name": "@clawwarden/sdk",
   "version": "0.1.0",
-  "description": "Thin TypeScript client for AgentGuard runtime monitoring + the Vaultex Governance Service.",
+  "description": "Thin TypeScript client for AgentGuard runtime monitoring + the ClawWarden Governance Service.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,7 +10,7 @@
     ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
   },
   "files": ["dist"],
-  "keywords": ["agentguard", "vaultex", "llm-monitoring", "governance", "sdk"],
+  "keywords": ["agentguard", "clawwarden", "llm-monitoring", "governance", "sdk"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",

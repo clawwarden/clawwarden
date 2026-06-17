@@ -80,7 +80,7 @@ function RedactionDemo() {
         }}
       >
         <span className="mono" style={{ fontSize: "0.7rem", color: "var(--ink-faint)", letterSpacing: "0.08em" }}>
-          vaultex · gateway · outbound
+          clawwarden · gateway · outbound
         </span>
         <span
           className="mono"
@@ -143,7 +143,7 @@ const PLANES = [
   {
     no: "01",
     name: "Input governance",
-    sub: "Vaultex",
+    sub: "ClawWarden",
     body: "Classify and tokenize PII and MNPI before any prompt leaves your network. Role-aware detokenization on the way back — and financial variables stay intact so analytics never break.",
     points: ["Semantic + NER classification", "Reversible tokenization", "Role-based disclosure"],
   },
@@ -180,41 +180,6 @@ const AUDIT_ROWS = [
 
 const FRAMEWORKS = ["NIST AI RMF", "SOC 2 Type II", "Fed SR 11-7", "GLBA", "GDPR", "EU AI Act", "OWASP LLM Top 10", "MITRE ATLAS"];
 
-const PRICING = [
-  {
-    name: "Open Source",
-    price: "$0",
-    period: "Apache-2.0",
-    desc: "Self-host the wedge. Reference detectors, classifier, integrations, and SDKs.",
-    cta: "View on GitHub",
-    href: "https://github.com/sammy995/vaultex",
-    external: true,
-    features: ["finsafe-core + classifier + integrations", "Python & TypeScript SDKs", "Governance contracts", "Community support"],
-    feature: false,
-  },
-  {
-    name: "Professional",
-    price: "$299",
-    period: "/ month",
-    desc: "Hosted gateway with tuned detection and the governance console.",
-    cta: "Start a trial",
-    href: "/setup",
-    external: false,
-    features: ["Tuned detectors + semantic classifier", "Governance dashboard", "90-day evidence retention", "Anthropic · OpenAI · Ollama routing", "Priority support"],
-    feature: true,
-  },
-  {
-    name: "Enterprise",
-    price: "Custom",
-    period: "BFSI",
-    desc: "For regulated institutions that need it on their own terms.",
-    cta: "Contact sales",
-    href: "mailto:hello@vaultex.space?subject=Vaultex%20Enterprise",
-    external: true,
-    features: ["On-prem / private VPC", "SOC 2 report + BFSI taxonomy", "SSO / SAML, custom RBAC", "Evidence packs + attestations", "99.9% uptime SLA"],
-    feature: false,
-  },
-];
 
 const FAQ = [
   ["Does the LLM ever see raw PII?", "No. The gateway classifies and tokenizes detected identifiers before the prompt is forwarded. For cloud providers the tokenized prompt travels to their API with no raw PII; for local models nothing leaves your machine. The token vault is encrypted and never transmitted."],
@@ -295,14 +260,14 @@ export default function LandingPage() {
               </h1>
               <p className="lede" style={{ marginTop: "28px", maxWidth: "44ch" }}>
                 Keep regulated data out of prompts. Catch runtime AI risk as it happens. Produce the
-                audit evidence regulators ask for — on one open-core platform.
+                audit evidence regulators ask for — on one open source platform.
               </p>
               <div style={{ display: "flex", gap: "12px", marginTop: "36px", flexWrap: "wrap" }}>
                 <Link href="/tokenize" className="btn btn-ink" style={{ padding: "14px 26px", fontSize: "0.98rem" }}>
                   Try the demo <ArrowRight size={17} />
                 </Link>
                 <a
-                  href="https://github.com/sammy995/vaultex"
+                  href="https://github.com/clawwarden/clawwarden"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-line"
@@ -360,7 +325,7 @@ export default function LandingPage() {
               Three planes, one trust fabric.
             </h2>
             <p className="lede" style={{ marginTop: "18px", maxWidth: "58ch" }}>
-              Most teams bolt point tools onto AI after the fact. Vaultex governs the whole path —
+              Most teams bolt point tools onto AI after the fact. ClawWarden governs the whole path —
               what goes in, what comes out, and the record that proves it.
             </p>
           </Reveal>
@@ -416,7 +381,7 @@ export default function LandingPage() {
           <div className="split-2" style={{ marginTop: "40px", gap: "0", borderTop: "1px solid var(--rule-strong)" }}>
             <Reveal>
               <div style={{ padding: "28px clamp(20px,3vw,40px) 28px 0", borderRight: "1px solid var(--rule)", height: "100%" }}>
-                <span className="eyebrow eyebrow-vault">What Vaultex does</span>
+                <span className="eyebrow eyebrow-vault">What ClawWarden does</span>
                 <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                   {[
                     "Tokenize PII/MNPI before prompts leave your network",
@@ -451,7 +416,7 @@ export default function LandingPage() {
                   ))}
                 </div>
                 <p style={{ marginTop: "18px", fontSize: "0.85rem", color: "var(--ink-faint)", lineHeight: 1.6 }}>
-                  Vaultex is the governance &amp; privacy control point — it complements your routing,
+                  ClawWarden is the governance &amp; privacy control point — it complements your routing,
                   IAM, and observability rather than replacing them.
                 </p>
               </div>
@@ -597,7 +562,7 @@ export default function LandingPage() {
                   in behind the same interfaces.
                 </p>
                 <a
-                  href="https://github.com/sammy995/vaultex"
+                  href="https://github.com/clawwarden/clawwarden"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn"
@@ -624,7 +589,7 @@ export default function LandingPage() {
 {`import {
   DetectorRegistry,
   referenceDetectors,
-} from '@vaultex/finsafe-core';
+} from '@clawwarden/finsafe-core';
 
 const registry = new DetectorRegistry(
   referenceDetectors(),
@@ -667,66 +632,24 @@ const findings = await registry.scan({
         </div>
       </section>
 
-      {/* ── PRICING ── */}
+      {/* ── OPEN SOURCE ── */}
       <section id="pricing" style={{ paddingTop: "clamp(80px,12vw,140px)" }}>
         <div className="wrap">
           <Reveal>
-            <Marker no="04" label="Pricing" tone="vault" />
-            <h2 className="display display-lg">Open to start. Priced to trust.</h2>
+            <Marker no="04" label="Open source" tone="vault" />
+            <h2 className="display display-lg">Free. Forever. Apache-2.0.</h2>
+            <p style={{ fontSize: "1rem", lineHeight: 1.65, marginTop: "18px", maxWidth: "62ch", color: "var(--ink-soft)" }}>
+              ClawWarden is fully open source — no paid tier, no locked features, no
+              telemetry. Self-host it, read every line, fork it, ship it. Bring your own
+              API key or run a local model. You hold the keys and the data.
+            </p>
+            <div style={{ display: "flex", gap: "12px", marginTop: "30px", flexWrap: "wrap" }}>
+              <a href="https://github.com/clawwarden/clawwarden" target="_blank" rel="noopener noreferrer" className="btn btn-vault">
+                View on GitHub
+              </a>
+              <Link href="/setup" className="btn btn-line">Quickstart</Link>
+            </div>
           </Reveal>
-          <div className="cols-3" style={{ marginTop: "48px", gap: "20px" }}>
-            {PRICING.map((p, i) => (
-              <Reveal key={p.name} delay={i * 90} style={{ height: "100%" }}>
-                <div
-                  className="panel"
-                  style={{
-                    padding: "32px 28px",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    background: p.feature ? "var(--ink)" : "var(--paper-card)",
-                    color: p.feature ? "var(--paper)" : "var(--ink)",
-                    border: p.feature ? "1px solid var(--ink)" : "1px solid var(--rule)",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <span className="eyebrow" style={{ color: p.feature ? "rgba(241,236,225,0.6)" : "var(--ink-faint)" }}>
-                      {p.name}
-                    </span>
-                    {p.feature && (
-                      <span className="mono" style={{ fontSize: "0.6rem", color: "var(--vault)", background: "var(--paper)", padding: "2px 8px", borderRadius: "100px", letterSpacing: "0.08em" }}>
-                        POPULAR
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginTop: "16px" }}>
-                    <span className="display" style={{ fontSize: "2.6rem", fontWeight: 600, color: "inherit" }}>{p.price}</span>
-                    <span className="mono" style={{ fontSize: "0.74rem", color: p.feature ? "rgba(241,236,225,0.6)" : "var(--ink-faint)" }}>{p.period}</span>
-                  </div>
-                  <p style={{ fontSize: "0.9rem", lineHeight: 1.55, marginTop: "10px", color: p.feature ? "rgba(241,236,225,0.78)" : "var(--ink-soft)" }}>
-                    {p.desc}
-                  </p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "11px", margin: "26px 0", flex: 1 }}>
-                    {p.features.map((f) => (
-                      <div key={f} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                        <Check size={15} color={p.feature ? "var(--paper)" : "var(--vault)"} strokeWidth={2.5} style={{ flexShrink: 0, marginTop: "2px" }} />
-                        <span style={{ fontSize: "0.86rem", color: p.feature ? "rgba(241,236,225,0.9)" : "var(--ink-soft)" }}>{f}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {p.external ? (
-                    <a href={p.href} target="_blank" rel="noopener noreferrer" className={`btn ${p.feature ? "btn-vault" : "btn-line"}`} style={{ width: "100%" }}>
-                      {p.cta}
-                    </a>
-                  ) : (
-                    <Link href={p.href} className={`btn ${p.feature ? "btn-vault" : "btn-line"}`} style={{ width: "100%" }}>
-                      {p.cta}
-                    </Link>
-                  )}
-                </div>
-              </Reveal>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -769,7 +692,7 @@ const findings = await registry.scan({
               <Link href="/tokenize" className="btn btn-ink" style={{ padding: "14px 28px", fontSize: "1rem" }}>
                 Try the demo <ArrowRight size={17} />
               </Link>
-              <a href="mailto:hello@vaultex.space?subject=Vaultex%20Demo" className="btn btn-line" style={{ padding: "14px 26px", fontSize: "1rem" }}>
+              <a href="mailto:hello@clawwarden.space?subject=ClawWarden%20Demo" className="btn btn-line" style={{ padding: "14px 26px", fontSize: "1rem" }}>
                 Book a demo
               </a>
             </div>

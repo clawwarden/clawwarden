@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
-  title: Vaultex Governance Service
+  title: ClawWarden Governance Service
   version: 0.1.0
   description: >
-    Cross-cutting trust fabric for the Vaultex AI Trust Infrastructure: policy
+    Cross-cutting trust fabric for the ClawWarden AI Trust Infrastructure: policy
     versioning, immutable audit chain, approvals/exceptions, reviewer sign-offs,
     control mapping, and evidence packs. See ../docs/architecture.md.
 
@@ -11,7 +11,7 @@ info:
     (dashboard, JWT bearer). Tenant scoping is derived from the credential.
 
 servers:
-  - url: https://api.vaultex.space
+  - url: https://api.clawwarden.space
     description: Production
 
 security:

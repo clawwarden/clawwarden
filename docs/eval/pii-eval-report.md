@@ -1,4 +1,4 @@
-# Vaultex — PII detection evaluation
+# ClawWarden — PII detection evaluation
 
 _Generated: 2026-06-16 17:16 UTC · corpus: 36 labeled examples (gateway/eval/corpus.py)._
 

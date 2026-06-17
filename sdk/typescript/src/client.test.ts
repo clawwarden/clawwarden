@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { AgentGuardClient, VaultexApiError } from './index.js';
+import { AgentGuardClient, ClawWardenApiError } from './index.js';
 
 function mockFetch(
   capture: { url?: string; method?: string; key?: string; body?: unknown },
@@ -59,14 +59,14 @@ describe('AgentGuardClient', () => {
     expect(cap.url).toBe('https://api.test/v1/governance/audit/verify');
   });
 
-  it('throws VaultexApiError on non-2xx', async () => {
+  it('throws ClawWardenApiError on non-2xx', async () => {
     const cap: Record<string, unknown> = {};
     const client = new AgentGuardClient({
       baseUrl: 'https://api.test',
       apiKey: 'k',
       fetchImpl: mockFetch(cap, { status: 401 }),
     });
-    await expect(client.getAuditEvents()).rejects.toBeInstanceOf(VaultexApiError);
+    await expect(client.getAuditEvents()).rejects.toBeInstanceOf(ClawWardenApiError);
   });
 
   it('sends a stable idempotency key on writes', async () => {
@@ -102,7 +102,7 @@ describe('AgentGuardClient', () => {
     await expect(client.recordCall({
       agentId: 'a', taskId: 't', model: 'm', provider: 'p',
       inputTokens: 1, outputTokens: 1, latencyMs: 1,
-    })).rejects.toBeInstanceOf(VaultexApiError);
+    })).rejects.toBeInstanceOf(ClawWardenApiError);
 
     expect(calls).toBe(3); // 1 initial + 2 retries
     expect(dropped).toEqual([{ path: '/v1/calls' }]);

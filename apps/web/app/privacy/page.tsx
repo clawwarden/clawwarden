@@ -6,8 +6,8 @@ import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "Vaultex Privacy Policy — how we handle data on the hosted site and what data we do not collect.",
-  alternates: { canonical: "https://vaultex.space/privacy" },
+  description: "ClawWarden Privacy Policy — how we handle data on the hosted site and what data we do not collect.",
+  alternates: { canonical: "https://clawwarden.space/privacy" },
 };
 
 const LAST_UPDATED = "13 May 2026";
@@ -15,19 +15,19 @@ const LAST_UPDATED = "13 May 2026";
 const sections = [
   {
     title: "1. Overview",
-    body: `This Privacy Policy describes how Vaultex ("we", "us", "our") handles information in connection with the Vaultex website (vaultex.space) and associated services.
+    body: `This Privacy Policy describes how ClawWarden ("we", "us", "our") handles information in connection with the ClawWarden website (clawwarden.space) and associated services.
 
-Vaultex is built around a core principle: we process as little personal data as possible, and we never collect the sensitive financial data that flows through the self-hosted gateway.`,
+ClawWarden is built around a core principle: we process as little personal data as possible, and we never collect the sensitive financial data that flows through the self-hosted gateway.`,
   },
   {
     title: "2. Self-Hosted Gateway — No Data Collection",
-    body: `If you deploy the Vaultex open-source gateway on your own infrastructure (the Starter / self-hosted tier), Vaultex collects zero data from your deployment.
+    body: `If you deploy the ClawWarden open-source gateway on your own infrastructure (the Starter / self-hosted tier), ClawWarden collects zero data from your deployment.
 
 All tokenization, PII detection, audit logs, session data, and Redis vault contents remain entirely within your network. We have no access to, and do not receive, any prompt data, customer PII, or vault contents from self-hosted deployments.`,
   },
   {
-    title: "3. Website (vaultex.space)",
-    body: `When you visit vaultex.space, standard web server logs may capture your IP address, browser type, referring URL, and pages visited. This information is used solely for security monitoring and aggregate analytics.
+    title: "3. Website (clawwarden.space)",
+    body: `When you visit clawwarden.space, standard web server logs may capture your IP address, browser type, referring URL, and pages visited. This information is used solely for security monitoring and aggregate analytics.
 
 We do not use tracking cookies or third-party analytics scripts that profile individual visitors.`,
   },
@@ -39,11 +39,11 @@ We do not use tracking cookies or third-party analytics scripts that profile ind
 • Company name (optional)
 • Role and message (optional)
 
-This information is used only to follow up about your enquiry, a pilot, or early access. We will not sell, share, or rent your contact information to third parties. You may request deletion at any time by emailing hello@vaultex.space.`,
+This information is used only to follow up about your enquiry, a pilot, or early access. We will not sell, share, or rent your contact information to third parties. You may request deletion at any time by emailing hello@clawwarden.space.`,
   },
   {
     title: "5. Hosted / SaaS Tiers",
-    body: `If you use a managed or hosted Vaultex tier (Professional or Enterprise), a separate Data Processing Agreement (DPA) governs the handling of any data processed through your deployment. Please contact hello@vaultex.space to request a DPA.
+    body: `If you use a managed or hosted ClawWarden tier (Professional or Enterprise), a separate Data Processing Agreement (DPA) governs the handling of any data processed through your deployment. Please contact hello@clawwarden.space to request a DPA.
 
 In hosted tiers, we process tokenized prompts on your behalf as a data processor. Raw PII never travels to our servers — it is tokenized before leaving your network boundary.`,
   },
@@ -57,7 +57,7 @@ We do not retain any prompt data, customer PII, or AI responses from self-hosted
   },
   {
     title: "7. Your Rights",
-    body: `Depending on your jurisdiction, you may have rights to access, correct, delete, or restrict processing of your personal data. To exercise any of these rights, contact us at hello@vaultex.space. We will respond within 30 days.
+    body: `Depending on your jurisdiction, you may have rights to access, correct, delete, or restrict processing of your personal data. To exercise any of these rights, contact us at hello@clawwarden.space. We will respond within 30 days.
 
 For EU/EEA residents, you may also lodge a complaint with your local supervisory authority.`,
   },
@@ -67,11 +67,11 @@ For EU/EEA residents, you may also lodge a complaint with your local supervisory
   },
   {
     title: "9. Changes to This Policy",
-    body: `We may update this Privacy Policy from time to time. Changes will be posted at vaultex.space/privacy with an updated "Last Updated" date. For material changes, we will make reasonable efforts to notify you.`,
+    body: `We may update this Privacy Policy from time to time. Changes will be posted at clawwarden.space/privacy with an updated "Last Updated" date. For material changes, we will make reasonable efforts to notify you.`,
   },
   {
     title: "10. Contact",
-    body: `For privacy-related questions or requests, contact us at:\n\nhello@vaultex.space`,
+    body: `For privacy-related questions or requests, contact us at:\n\nhello@clawwarden.space`,
   },
 ];
 
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
                 {s.title === "10. Contact" ? (
                   <>
                     For privacy-related questions or requests, contact us at:{"\n\n"}
-                    <a className="link-underline" href="mailto:hello@vaultex.space">hello@vaultex.space</a>
+                    <a className="link-underline" href="mailto:hello@clawwarden.space">hello@clawwarden.space</a>
                   </>
                 ) : s.body}
               </div>
@@ -114,7 +114,7 @@ export default function PrivacyPage() {
           <div style={{ display: "flex", gap: "20px" }}>
             <Link href="/terms" style={{ fontSize: "0.83rem", color: "var(--ink-faint)", textDecoration: "none" }}>Terms of Use</Link>
             <Link href="/compliance" style={{ fontSize: "0.83rem", color: "var(--ink-faint)", textDecoration: "none" }}>Compliance</Link>
-            <a href="mailto:hello@vaultex.space" style={{ fontSize: "0.83rem", color: "var(--ink-faint)", textDecoration: "none" }}>Contact</a>
+            <a href="mailto:hello@clawwarden.space" style={{ fontSize: "0.83rem", color: "var(--ink-faint)", textDecoration: "none" }}>Contact</a>
           </div>
         </div>
       </main>

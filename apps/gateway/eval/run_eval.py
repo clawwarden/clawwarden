@@ -85,7 +85,7 @@ def main() -> None:
     detectors = {"regex": regex_detect, "ner": ner_detect}
     results = {}
     report = [
-        "# Vaultex — PII detection evaluation",
+        "# ClawWarden — PII detection evaluation",
         "",
         f"_Generated: {datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} · "
         f"corpus: {len(LABELED_CORPUS)} labeled examples (gateway/eval/corpus.py)._",

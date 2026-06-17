@@ -16,8 +16,8 @@ const STEPS = [
     time: "~3 min",
     title: "Pull and start the gateway",
     what: "One docker-compose command starts the FastAPI gateway, Presidio NER engine, and Redis token vault — all in your network.",
-    command: "git clone https://github.com/sammy995/vaultex-core\ncd vaultex-core\ndocker-compose up -d",
-    output: "✓  presidio-analyzer  started\n✓  redis              started\n✓  vaultex-gateway    started\n→  Listening on http://localhost:8000",
+    command: "git clone https://github.com/clawwarden/clawwarden-core\ncd clawwarden-core\ndocker-compose up -d",
+    output: "✓  presidio-analyzer  started\n✓  redis              started\n✓  clawwarden-gateway    started\n→  Listening on http://localhost:8000",
   },
   {
     num: "03",
@@ -113,7 +113,7 @@ export default function OnboardingTimeline() {
       </div>
 
       <p style={{ marginTop: "12px", fontSize: "0.72rem", color: "var(--ink-faint)", textAlign: "center", lineHeight: 1.6 }}>
-        Commands target vaultex v0.x · Tested on macOS (Apple Silicon), Linux (x86_64), Windows with WSL2
+        Commands target clawwarden v0.x · Tested on macOS (Apple Silicon), Linux (x86_64), Windows with WSL2
       </p>
     </div>
   );

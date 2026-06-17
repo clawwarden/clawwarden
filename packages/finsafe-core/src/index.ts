@@ -1,8 +1,8 @@
 /**
- * @vaultex/finsafe-core — runtime AI-safety detectors.
+ * @clawwarden/finsafe-core — runtime AI-safety detectors.
  *
  * Open interfaces + reference heuristic detectors for OWASP LLM Top 10 risks.
- * The proprietary Vaultex detectors implement the same `Detector` interface
+ * a custom detectors implement the same `Detector` interface
  * with tuned models and per-model risk scoring.
  */
 

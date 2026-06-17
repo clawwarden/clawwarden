@@ -300,7 +300,7 @@ export default function SetupPage() {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                   {[
-                    "git clone https://github.com/sammy995/vaultex-core",
+                    "git clone https://github.com/clawwarden/clawwarden-core",
                     "docker-compose up -d",
                     "npm run dev  # visit localhost:3000",
                   ].map((cmd, i) => (
@@ -485,7 +485,7 @@ export default function SetupPage() {
                         <Lock size={12} style={{ color: "#6f5519", flexShrink: 0 }} />
                         <span style={{ fontSize: "0.74rem", color: "#6f5519" }}>Requires Pro plan — </span>
                         <a
-                          href="mailto:hello@vaultex.space?subject=Vaultex%20Professional%20Plan%20%E2%80%94%20Demo%20Request"
+                          href="mailto:hello@clawwarden.space?subject=ClawWarden%20Professional%20Plan%20%E2%80%94%20Demo%20Request"
                           onClick={e => e.stopPropagation()}
                           style={{ fontSize: "0.74rem", color: "#0d5a40", fontWeight: 700, textDecoration: "none" }}
                         >
@@ -661,11 +661,11 @@ export default function SetupPage() {
                             <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "#6f5519" }}>Browser blocked: HTTPS → HTTP not allowed</span>
                           </div>
                           <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.6, margin: "0 0 12px" }}>
-                            You&apos;re on <strong style={{ color: "var(--text-primary)" }}>https://vaultex.space</strong>. Browsers block requests to <code style={{ fontFamily: "var(--font-mono)", color: "#6f5519", fontSize: "0.74rem" }}>http://localhost</code> from HTTPS pages (mixed content). To connect your local Ollama, run the UI on your own machine:
+                            You&apos;re on <strong style={{ color: "var(--text-primary)" }}>https://clawwarden.space</strong>. Browsers block requests to <code style={{ fontFamily: "var(--font-mono)", color: "#6f5519", fontSize: "0.74rem" }}>http://localhost</code> from HTTPS pages (mixed content). To connect your local Ollama, run the UI on your own machine:
                           </p>
                           <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                             {[
-                              { cmd: "git clone https://github.com/sammy995/vaultex-core && cd vaultex-core", note: "Clone repo" },
+                              { cmd: "git clone https://github.com/clawwarden/clawwarden-core && cd clawwarden-core", note: "Clone repo" },
                               { cmd: "docker-compose up -d", note: "Start gateway + Redis" },
                               { cmd: "cd ui && npm install && npm run dev", note: "UI at localhost:3000" },
                             ].map((r, i) => (
@@ -795,12 +795,12 @@ export default function SetupPage() {
                 <div style={{ fontWeight: 700, color: "#6f5519", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
                   <span style={{ fontSize: "0.7rem" }}>⚠</span> Important — Your Responsibility
                 </div>
-                Vaultex tokenizes PII locally using Microsoft Presidio before any data reaches your Ollama instance.
+                ClawWarden tokenizes PII locally using Microsoft Presidio before any data reaches your Ollama instance.
                 The token vault and all decrypted values remain on your own machine.{" "}
                 <strong style={{ color: "var(--text-secondary)" }}>You are solely responsible</strong>{" "}
                 for securing your local infrastructure, enforcing data governance policies, and ensuring compliance
                 with applicable laws (GLBA, GDPR, HIPAA, CCPA, etc.) in your jurisdiction.
-                Vaultex is provided as-is, without warranties of any kind. It is not a substitute for qualified legal
+                ClawWarden is provided as-is, without warranties of any kind. It is not a substitute for qualified legal
                 or compliance counsel. By proceeding you acknowledge that you have read and accepted our{" "}
                 <a href="/terms" style={{ color: "#6f5519", textDecoration: "underline" }}>Terms of Use</a>.
               </div>
@@ -921,8 +921,8 @@ export default function SetupPage() {
                     <Terminal size={13} style={{ color: "#b23a20" }} /> How to start the gateway
                   </div>
                   {[
-                    { cmd: "git clone https://github.com/sammy995/vaultex-core", note: "Clone repo" },
-                    { cmd: "cd vaultex-core", note: "" },
+                    { cmd: "git clone https://github.com/clawwarden/clawwarden-core", note: "Clone repo" },
+                    { cmd: "cd clawwarden-core", note: "" },
                     { cmd: "docker-compose up -d", note: "Starts gateway on :8000 + Redis" },
                   ].map((r, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "5px" }}>

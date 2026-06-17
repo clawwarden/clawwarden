@@ -1,6 +1,6 @@
-"""Vaultex open SDK — data-sensitivity classification + Governance Service client."""
+"""ClawWarden open SDK — data-sensitivity classification + Governance Service client."""
 
-from vaultex.classifier import (
+from clawwarden.classifier import (
     Classifier,
     ClassificationResult,
     DataSensitivity,
@@ -9,7 +9,7 @@ from vaultex.classifier import (
     RegexNerPipeline,
     max_sensitivity,
 )
-from vaultex.governance import GovernanceClient
+from clawwarden.governance import GovernanceClient
 
 __all__ = [
     "Classifier",

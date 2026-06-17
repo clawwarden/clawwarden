@@ -6,8 +6,8 @@ import SiteFooter from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Compliance",
   description:
-    "How Vaultex maps to the frameworks regulated institutions answer to: NIST AI RMF, SOC 2, Fed SR 11-7, GLBA, GDPR, EU AI Act, ISO 42001.",
-  alternates: { canonical: "https://vaultex.space/compliance" },
+    "How ClawWarden maps to the frameworks regulated institutions answer to: NIST AI RMF, SOC 2, Fed SR 11-7, GLBA, GDPR, EU AI Act, ISO 42001.",
+  alternates: { canonical: "https://clawwarden.space/compliance" },
 };
 
 const FRAMEWORKS: { code: string; name: string; how: string }[] = [
@@ -36,7 +36,7 @@ export default function CompliancePage() {
               Mapped to the frameworks your auditors already use.
             </h1>
             <p className="lede">
-              Vaultex doesn't claim certifications it doesn't hold. It gives you the controls and the
+              ClawWarden doesn't claim certifications it doesn't hold. It gives you the controls and the
               evidence — versioned policies, an immutable audit chain, and exportable evidence packs —
               that compliance teams assemble those certifications from.
             </p>
@@ -72,20 +72,20 @@ export default function CompliancePage() {
               "Show me this control worked for the last 90 days."
             </p>
             <p style={{ marginTop: "14px", fontSize: "0.98rem", lineHeight: 1.7, color: "var(--ink-soft)", maxWidth: "66ch" }}>
-              Vaultex answers that question with one export: a date-ranged bundle of the verified audit
+              ClawWarden answers that question with one export: a date-ranged bundle of the verified audit
               chain, control coverage, the decisions taken, and the artifacts that justify them — with
               chain integrity checked at export time.
             </p>
           </div>
 
           <p style={{ marginTop: "40px", fontSize: "0.82rem", color: "var(--ink-faint)", lineHeight: 1.7, maxWidth: "70ch" }}>
-            Vaultex is architected to support compliance; it is not legal advice. Final determinations
+            ClawWarden is architected to support compliance; it is not legal advice. Final determinations
             rest with your legal, compliance, and data-protection teams.
           </p>
 
           <div style={{ marginTop: "28px", display: "flex", gap: "12px", flexWrap: "wrap", paddingBottom: "20px" }}>
             <Link href="/security" className="btn btn-ink">Security architecture</Link>
-            <a href="mailto:hello@vaultex.space?subject=Compliance%20review" className="btn btn-line">Request a compliance review</a>
+            <a href="mailto:hello@clawwarden.space?subject=Compliance%20review" className="btn btn-line">Request a compliance review</a>
           </div>
         </div>
       </main>

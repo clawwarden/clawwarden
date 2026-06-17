@@ -1,12 +1,12 @@
 # Security Policy
 
-Vaultex is security infrastructure for regulated enterprises. We take vulnerabilities seriously.
+ClawWarden is security infrastructure for regulated enterprises. We take vulnerabilities seriously.
 
 ## Reporting a vulnerability
 
 **Do not open a public issue for security problems.**
 
-Email **security@vaultex.space** with:
+Email **security@clawwarden.space** with:
 
 - A description of the issue and its impact
 - Steps to reproduce (PoC if possible)
@@ -18,7 +18,7 @@ Please give us a reasonable disclosure window before going public.
 ## Scope
 
 In scope: the open-source packages in this repository (`packages/*`, `sdk/*`, `contracts/`).
-For the proprietary Vaultex Cloud / Enterprise core, email the same address — it is routed to the
+For a custom Cloud / Enterprise core, email the same address — it is routed to the
 same team.
 
 ## Hardening notes

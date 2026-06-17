@@ -1,10 +1,10 @@
-# Contributing to Vaultex
+# Contributing to ClawWarden
 
 Thanks for helping build open AI trust infrastructure. 🙌
 
 ## Ground rules
 
-- **Open-core boundary.** This repo holds the open wedge: SDKs, contracts, integration adapters,
+- **Open source boundary.** This repo holds the open wedge: SDKs, contracts, integration adapters,
   and detector/classifier **interfaces + reference implementations**. Proprietary risk logic
   (tuned detectors, model-risk scoring, BFSI taxonomy, governance internals) is **not** accepted
   here — keep PRs to the open surface. If a change needs a proprietary provider, code against the

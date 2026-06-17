@@ -105,7 +105,7 @@ class AuditEntry(Base):
 # Postgres trigger that rejects any UPDATE or DELETE on the audit table, making it
 # genuinely append-only (WORM). No-op on SQLite (dev/CI) — true WORM needs Postgres.
 _WORM_TRIGGER_SQL = """
-CREATE OR REPLACE FUNCTION vaultex_audit_no_mutate() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION clawwarden_audit_no_mutate() RETURNS trigger AS $$
 BEGIN
   RAISE EXCEPTION 'audit_entries is append-only (WORM): % blocked', TG_OP;
 END;
@@ -114,7 +114,7 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_audit_no_mutate ON audit_entries;
 CREATE TRIGGER trg_audit_no_mutate
   BEFORE UPDATE OR DELETE ON audit_entries
-  FOR EACH ROW EXECUTE FUNCTION vaultex_audit_no_mutate();
+  FOR EACH ROW EXECUTE FUNCTION clawwarden_audit_no_mutate();
 """
 
 

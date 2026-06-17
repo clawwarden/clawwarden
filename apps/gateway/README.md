@@ -10,7 +10,7 @@
 </p>
 
 <h1 align="center">
-  🔒 Vaultex Core
+  🔒 ClawWarden Core
 </h1>
 
 <p align="center">
@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="https://vaultex.space">Hosted version</a> ·
+  <a href="https://clawwarden.space">Hosted version</a> ·
   <a href="#quick-start">Quick Start</a> ·
   <a href="#how-it-works">How it Works</a> ·
   <a href="#api-reference">API</a> ·
@@ -34,7 +34,7 @@
 
 Your analysts are pasting customer data into ChatGPT. You know it. They know it. Banning it doesn't work — they'll use their phones. What you actually need is a proxy that strips PII before the prompt leaves your machine and puts it back after the response arrives, transparently, with a full audit trail.
 
-That's Vaultex Core.
+That's ClawWarden Core.
 
 ---
 
@@ -42,10 +42,10 @@ That's Vaultex Core.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                          VAULTEX CORE — request flow                         │
+│                          CLAWWARDEN CORE — request flow                         │
 └──────────────────────────────────────────────────────────────────────────────┘
 
-  Client                 Vaultex Gateway              LLM Provider
+  Client                 ClawWarden Gateway              LLM Provider
     │                         │                            │
     │  POST /v1/chat          │                            │
     │  ─────────────────────► │                            │
@@ -79,8 +79,8 @@ That's Vaultex Core.
 ### Option A — Docker (recommended, no Python setup required)
 
 ```bash
-git clone https://github.com/sammy995/vaultex-core.git
-cd vaultex-core
+git clone https://github.com/clawwarden/clawwarden-core.git
+cd clawwarden-core
 docker compose up
 ```
 
@@ -90,8 +90,8 @@ The first startup downloads spaCy `en_core_web_lg` (~800 MB) — subsequent star
 ### Option B — Local Python
 
 ```bash
-git clone https://github.com/sammy995/vaultex-core.git
-cd vaultex-core
+git clone https://github.com/clawwarden/clawwarden-core.git
+cd clawwarden-core
 
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -336,7 +336,7 @@ This is a banking use-case. If you mask `$42,500`, the LLM can't compute average
 ## What's in the enterprise version?
 
 The core tokenization engine is MIT open-source and always will be.  
-[Vaultex hosted](https://vaultex.space) adds:
+[ClawWarden hosted](https://clawwarden.space) adds:
 
 | Feature | Core (this repo) | Professional | Enterprise |
 |---|---|---|---|
@@ -350,7 +350,7 @@ The core tokenization engine is MIT open-source and always will be.
 | GLBA evidence pack | — | — | ✓ |
 | Support | GitHub Issues | Priority email | Dedicated Slack + SLA |
 
-→ [Join the waitlist](https://vaultex.space/#waitlist)
+→ [Join the waitlist](https://clawwarden.space/#waitlist)
 
 ---
 

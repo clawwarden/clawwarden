@@ -1,4 +1,4 @@
-# Vaultex-Core — Phase 3 Security & Correctness Audit
+# ClawWarden-Core — Phase 3 Security & Correctness Audit
 
 _Date: 2026-06-15 · Scope: `gateway/` (the flagship engine) + its test suite · Reviewer pass: static read of every module + TDD verification._
 
@@ -26,7 +26,7 @@ New tests: [tests/test_security_findings.py](../tests/test_security_findings.py)
 | **R4** | Medium | **Token-numbering race.** `get_or_create_token_for_hash` does check-then-incr non-atomically; concurrent identical new values can mint two tokens for one value. | Use a Redis Lua script or `SETNX` on the hash key, deriving the counter only after a successful claim. |
 | **R5** | Low | **`rbac.decode_jwt` is dead and unsafe.** Decodes with no `exp`/`aud`/`iss` verification. Unused by `main` (which uses `validate_token`), but a trap if ever called. | Delete it; update `tests/test_rbac.py` to use `validate_token`. |
 | **R6** | Low | **`MONEY`→`CURRENCY` branch is dead.** `ALL_ENTITIES` excludes MONEY, so the remap in [gateway/tokenizer.py](../gateway/tokenizer.py) never runs. | Remove, or intentionally enable currency handling. Harmless but misleading. |
-| **R7** | Low | **CORS origins hardcoded** in [gateway/config.py](../gateway/config.py) (`vaultex.space`, vercel preview, `vaultex.app`) as defaults with `allow_credentials=True`. | Drive entirely from `ALLOWED_ORIGINS`; ship no production hostnames as code defaults. |
+| **R7** | Low | **CORS origins hardcoded** in [gateway/config.py](../gateway/config.py) (`clawwarden.space`, vercel preview, `clawwarden.app`) as defaults with `allow_credentials=True`. | Drive entirely from `ALLOWED_ORIGINS`; ship no production hostnames as code defaults. |
 | **R8** | Low | **SQLite default + single-writer** (documented DB6 halt-point) — fine for self-host/demo, blocks HA. | Already documented; Postgres via `DATABASE_URL`. No action for the open/self-host story. |
 
 ## What's genuinely solid (keep — these are credibility for the paper)
@@ -46,4 +46,4 @@ New tests: [tests/test_security_findings.py](../tests/test_security_findings.py)
 3. R2/R3 before any hosted (non-self-host) deployment.
 4. Fold these fixes into the unified monorepo's `apps/gateway` during Phase 1.
 
-_Nothing here is committed yet — all changes are in the `vaultex-core` working tree pending review._
+_Nothing here is committed yet — all changes are in the `clawwarden-core` working tree pending review._

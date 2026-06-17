@@ -1,4 +1,4 @@
-from vaultex import (
+from clawwarden import (
     Classifier,
     ClassificationResult,
     DataSensitivity,

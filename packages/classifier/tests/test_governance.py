@@ -3,7 +3,7 @@ import json
 
 import httpx
 
-from vaultex import GovernanceClient
+from clawwarden import GovernanceClient
 
 
 def _client(handler, *, api_key="k", base_url="https://gov.test"):

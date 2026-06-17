@@ -22,9 +22,9 @@ class Settings(BaseSettings):
     allowed_origins: str = (
         "http://localhost:3000,"
         "http://localhost:3001,"
-        "https://vaultex-iota.vercel.app,"
-        "https://vaultex.space,"
-        "https://vaultex.app"
+        "https://clawwarden-iota.vercel.app,"
+        "https://clawwarden.space,"
+        "https://clawwarden.app"
     )
 
     # Enterprise JWT claims — validated on every request
@@ -56,9 +56,9 @@ class Settings(BaseSettings):
     # never rotate it in place without re-signing the stored chain.
     audit_hmac_key: str = ""
 
-    # Shared Governance Service (AgentGuard) — Vaultex ships audit + evidence
+    # Shared Governance Service (AgentGuard) — ClawWarden ships audit + evidence
     # to the cross-cutting trust fabric. See MANIFESTO.md §0/§7. When the URL or
-    # API key is unset, the client no-ops so Vaultex still runs standalone.
+    # API key is unset, the client no-ops so ClawWarden still runs standalone.
     governance_url: str = ""
     governance_api_key: str = ""
     governance_timeout_seconds: float = 3.0

@@ -19,7 +19,7 @@ os.environ["ALLOW_INSECURE_TOKEN_ENDPOINT"] = "false"
 # Point the SQLite user DB at a writable temp path so importing gateway.database
 # / gateway.main never tries to create the container's /data dir on a dev host.
 os.environ.setdefault(
-    "DB_PATH", os.path.join(tempfile.gettempdir(), "vaultex_test_users.db")
+    "DB_PATH", os.path.join(tempfile.gettempdir(), "clawwarden_test_users.db")
 )
 
 import pytest

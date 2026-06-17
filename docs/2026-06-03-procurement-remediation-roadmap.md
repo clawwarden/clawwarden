@@ -1,8 +1,8 @@
 # Procurement Remediation Roadmap
 
-**Context:** A simulated CIO/CTO procurement evaluation of vaultex.space praised the
+**Context:** A simulated CIO/CTO procurement evaluation of clawwarden.space praised the
 *technology* (three-plane architecture, reversible tokenization, hash-chained WORM
-audit, <8 ms latency, open-core) but issued a **rejection of the commercial tiers**
+audit, <8 ms latency, open source) but issued a **rejection of the commercial tiers**
 on **trust, legal, and operational** grounds — not technical ones. It pegged
 willingness-to-pay at **$85k–$130k/yr** for an on-prem enterprise license *once the
 corporate gaps close*. This document turns each finding into an owned action.
@@ -22,7 +22,7 @@ The review was written against the pre-overhaul site. Verified live today:
 | 1 | Broken /pricing /compliance /privacy /terms | E | Rebuilt + deployed | ✅ Done |
 | 2 | "Claims SOC 2 but no report" | E/F | `/compliance` now claims no certs it lacks; SOC 2 marked *in progress* | ✅ Honest copy / ⏳ real audit = F |
 | 3 | Corporate anonymity (no entity/founders/address) | F→E | Add real entity, leadership, registered address; E wires into site once provided | ⏳ needs F data |
-| 4 | **Brand collision** ("Vaultex" × 5 incl. £127M UK bank JV) | F | Choose a clearable name; run USPTO + EUIPO + domain clearance; rebrand | 🔴 decision pending |
+| 4 | **Brand collision** ("ClawWarden" × 5 incl. £127M UK bank JV) | F | Choose a clearable name; run USPTO + EUIPO + domain clearance; rebrand | 🔴 decision pending |
 | 5 | No SOC 2 Type II report | F | Engage auditor (e.g., Vanta/Drata + CPA firm); 3–6 mo Type II window | ⏳ |
 | 6 | No DPA / binding privacy terms | F (legal) + E | Draft DPA template; link "DPA on request"; E adds the request flow | ⏳ |
 | 7 | No SLAs / incident escalation / phone | F | Define SLA tiers + support channels + escalation matrix | ⏳ |

@@ -1,24 +1,24 @@
 ﻿<p align="center">
-  <img src="https://img.shields.io/badge/live-vaultex.space-00d4ff?style=flat-square" alt="Live site" />
+  <img src="https://img.shields.io/badge/live-clawwarden.space-00d4ff?style=flat-square" alt="Live site" />
   <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js" alt="Next.js 15" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vercel-deployed-000?style=flat-square&logo=vercel" alt="Vercel" />
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="MIT License" />
 </p>
 
-<h1 align="center">Vaultex — UI</h1>
+<h1 align="center">ClawWarden — UI</h1>
 
 <p align="center">
-  Marketing site and web interface for <a href="https://vaultex.space">Vaultex</a> — the AI privacy gateway for financial services.<br/>
+  Marketing site and web interface for <a href="https://clawwarden.space">ClawWarden</a> — the AI privacy gateway for financial services.<br/>
   Built with Next.js 15 App Router, TypeScript, and Tailwind CSS.
 </p>
 
 <p align="center">
-  <a href="https://vaultex.space">Live Site</a> ·
-  <a href="https://github.com/sammy995/vaultex-core">Gateway (vaultex-core)</a> ·
-  <a href="https://vaultex.space/pricing">Pricing</a> ·
-  <a href="https://vaultex.space/security">Security</a> ·
-  <a href="https://vaultex.space/#waitlist">Waitlist</a>
+  <a href="https://clawwarden.space">Live Site</a> ·
+  <a href="https://github.com/clawwarden/clawwarden-core">Gateway (clawwarden-core)</a> ·
+  <a href="https://clawwarden.space/pricing">Pricing</a> ·
+  <a href="https://clawwarden.space/security">Security</a> ·
+  <a href="https://clawwarden.space/#waitlist">Waitlist</a>
 </p>
 
 ---
@@ -48,7 +48,7 @@ npm run dev        # http://localhost:3000
 ```
 
 > **Note:** `/chat` and `/admin` require the Python gateway running at `http://localhost:8000`.
-> See [vaultex-core](https://github.com/sammy995/vaultex-core) for gateway setup instructions.
+> See [clawwarden-core](https://github.com/clawwarden/clawwarden-core) for gateway setup instructions.
 
 ---
 
@@ -80,9 +80,9 @@ The Python gateway is **not** on Vercel — it runs locally or on your own infra
 
 ## Related
 
-- **[vaultex-core](https://github.com/sammy995/vaultex-core)** — Python FastAPI gateway with Presidio NER, RBAC, Redis vault, audit trail
-- **[vaultex.space](https://vaultex.space)** — Live hosted version
-- **[vaultex.space/#waitlist](https://vaultex.space/#waitlist)** — Early access waitlist
+- **[clawwarden-core](https://github.com/clawwarden/clawwarden-core)** — Python FastAPI gateway with Presidio NER, RBAC, Redis vault, audit trail
+- **[clawwarden.space](https://clawwarden.space)** — Live hosted version
+- **[clawwarden.space/#waitlist](https://clawwarden.space/#waitlist)** — Early access waitlist
 
 ---
 

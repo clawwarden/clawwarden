@@ -147,7 +147,7 @@ function downloadSampleCSV() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "vaultex_sample_financial_data.csv";
+  a.download = "clawwarden_sample_financial_data.csv";
   a.click();
   URL.revokeObjectURL(url);
 }

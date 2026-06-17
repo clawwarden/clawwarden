@@ -7,8 +7,8 @@ import SiteFooter from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Vaultex builds open-core AI trust infrastructure for regulated enterprises — input governance, runtime safety, and an immutable governance engine.",
-  alternates: { canonical: "https://vaultex.space/about" },
+    "ClawWarden builds open source AI trust infrastructure for regulated enterprises — input governance, runtime safety, and an immutable governance engine.",
+  alternates: { canonical: "https://clawwarden.space/about" },
 };
 
 const PRINCIPLES = [
@@ -40,15 +40,15 @@ export default function AboutPage() {
           </p>
 
           <p className="drop-cap" style={{ marginTop: "28px", fontSize: "1.02rem", lineHeight: 1.8, color: "var(--ink-soft)" }}>
-            Vaultex exists to close that gap. We build the trust layer between an enterprise and the
+            ClawWarden exists to close that gap. We build the trust layer between an enterprise and the
             LLMs it uses — governing what goes in, watching what comes out, and keeping the immutable
             record that proves it. It's three planes around one trust fabric: input governance
-            (Vaultex), runtime monitoring and safety (AgentGuard · FIN-SAFE), and a governance engine
+            (ClawWarden), runtime monitoring and safety (AgentGuard · FIN-SAFE), and a governance engine
             with versioned policies, an append-only audit chain, and regulator-ready evidence packs.
           </p>
 
           <p style={{ marginTop: "20px", fontSize: "1.02rem", lineHeight: 1.8, color: "var(--ink-soft)" }}>
-            We build it open-core because trust infrastructure earns adoption by being inspectable.
+            We build it open source because trust infrastructure earns adoption by being inspectable.
             The interfaces and reference implementations are Apache-2.0 and run standalone forever;
             the tuned detection, BFSI risk taxonomy, and managed compliance are the commercial core.
           </p>
@@ -79,7 +79,7 @@ export default function AboutPage() {
           </div>
 
           <div style={{ marginTop: "56px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <a href="https://github.com/sammy995/vaultex" target="_blank" rel="noopener noreferrer" className="btn btn-ink">
+            <a href="https://github.com/clawwarden/clawwarden" target="_blank" rel="noopener noreferrer" className="btn btn-ink">
               Read the source <ArrowUpRight size={16} />
             </a>
             <Link href="/security" className="btn btn-line">How it's built</Link>

@@ -1,4 +1,4 @@
-"""Standalone client for the Vaultex Governance Service.
+"""Standalone client for the ClawWarden Governance Service.
 
 Best-effort, fail-open shipping: governance outages never break the caller.
 No-ops when unconfigured. Mirrors `contracts/openapi.governance.yaml`.
@@ -19,7 +19,7 @@ from typing import Any, Awaitable, Callable, Optional, Union
 
 import httpx
 
-log = logging.getLogger("vaultex.governance")
+log = logging.getLogger("clawwarden.governance")
 
 # Called with (path, body) when a write is dropped after exhausting retries.
 # May be sync or async; exceptions raised by the hook are swallowed.

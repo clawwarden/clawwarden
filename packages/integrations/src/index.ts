@@ -1,5 +1,5 @@
 /**
- * @vaultex/integrations — observability & IAM adapters for the Vaultex stack.
+ * @clawwarden/integrations — observability & IAM adapters for the ClawWarden stack.
  * Dependency-light: pure formatters + thin fetch-based exporters.
  */
 

@@ -1,12 +1,12 @@
 # Governance Service Contracts
 
-The **language-neutral wire contract** for the Vaultex Governance Service — the shared trust fabric
+The **language-neutral wire contract** for the ClawWarden Governance Service — the shared trust fabric
 that records *what the rules were, who changed them, why something was blocked, and what evidence
 proves it*.
 
 Both planes mirror these contracts:
 
-- **Vaultex** (input governance, Python) — ships audit + evidence via `sdk/python`.
+- **ClawWarden** (input governance, Python) — ships audit + evidence via `sdk/python`.
 - **AgentGuard** (runtime + FIN-SAFE, TypeScript) — emits verdicts/findings via `sdk/typescript`.
 
 ## Files

@@ -1,0 +1,41 @@
+name: Bug report
+description: Something isn't working as documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. docker compose up
+        2. POST /v1/chat/completions with ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+    validations:
+      required: false
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options: [gateway, web, classifier, finsafe-core, integrations, sdk, docs]
+    validations:
+      required: true
+  - type: checkboxes
+    id: no-pii
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have not included any real PII, secrets, or customer data in this report.
+          required: true

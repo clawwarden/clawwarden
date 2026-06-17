@@ -18,10 +18,10 @@ describe('SIEM formatting', () => {
   it('formats RFC 5424 syslog with severity-derived PRI', () => {
     const line = formatSyslog(
       { eventType: 'pii_detected', severity: 'critical', message: 'SSN found', timestamp: TS },
-      { hostname: 'gw1', appName: 'vaultex' },
+      { hostname: 'gw1', appName: 'clawwarden' },
     );
     // facility 16 * 8 + critical(2) = 130
-    expect(line.startsWith('<130>1 2026-06-02T12:00:00.000Z gw1 vaultex')).toBe(true);
+    expect(line.startsWith('<130>1 2026-06-02T12:00:00.000Z gw1 clawwarden')).toBe(true);
     expect(line).toContain('pii_detected');
     expect(line).toContain('SSN found');
   });
@@ -32,7 +32,7 @@ describe('SIEM formatting', () => {
       message: 'bad token',
       attributes: { role: 'admin', count: 3 },
     });
-    expect(line).toContain('[vaultex@0 role="admin" count="3"]');
+    expect(line).toContain('[clawwarden@0 role="admin" count="3"]');
   });
 
   it('strips CR/LF from eventType and message (log injection)', () => {
@@ -81,20 +81,20 @@ describe('SplunkHecExporter', () => {
 describe('PrometheusRegistry', () => {
   it('renders counters and gauges in exposition format', () => {
     const reg = new PrometheusRegistry();
-    reg.inc('vaultex_requests_total', { route: 'chat' }, 1, 'Total requests');
-    reg.inc('vaultex_requests_total', { route: 'chat' });
-    reg.set('vaultex_chain_valid', 1, {}, 'Audit chain integrity');
+    reg.inc('clawwarden_requests_total', { route: 'chat' }, 1, 'Total requests');
+    reg.inc('clawwarden_requests_total', { route: 'chat' });
+    reg.set('clawwarden_chain_valid', 1, {}, 'Audit chain integrity');
     const out = reg.render();
-    expect(out).toContain('# TYPE vaultex_requests_total counter');
-    expect(out).toContain('vaultex_requests_total{route="chat"} 2');
-    expect(out).toContain('vaultex_chain_valid 1');
+    expect(out).toContain('# TYPE clawwarden_requests_total counter');
+    expect(out).toContain('clawwarden_requests_total{route="chat"} 2');
+    expect(out).toContain('clawwarden_chain_valid 1');
   });
 });
 
 describe('Datadog', () => {
   it('maps samples to a v2 series payload', () => {
-    const payload = toDatadogSeries([{ name: 'vaultex.latency', value: 12, tags: { env: 'prod' }, timestamp: TS }]);
-    expect(payload.series[0]!.metric).toBe('vaultex.latency');
+    const payload = toDatadogSeries([{ name: 'clawwarden.latency', value: 12, tags: { env: 'prod' }, timestamp: TS }]);
+    expect(payload.series[0]!.metric).toBe('clawwarden.latency');
     expect(payload.series[0]!.tags).toEqual(['env:prod']);
     expect(payload.series[0]!.points[0]![1]).toBe(12);
   });
@@ -102,8 +102,8 @@ describe('Datadog', () => {
 
 describe('OpenTelemetry helpers', () => {
   it('builds semantic resource attributes', () => {
-    const attrs = buildResourceAttributes({ serviceName: 'vaultex-gw', serviceVersion: '1.0.0', environment: 'prod' });
-    expect(attrs['service.name']).toBe('vaultex-gw');
+    const attrs = buildResourceAttributes({ serviceName: 'clawwarden-gw', serviceVersion: '1.0.0', environment: 'prod' });
+    expect(attrs['service.name']).toBe('clawwarden-gw');
     expect(attrs['deployment.environment']).toBe('prod');
   });
 

@@ -1,0 +1,14 @@
+ClawWarden
+Copyright 2026 The ClawWarden Authors
+
+This product is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this product except in compliance with the License. A copy of the
+License is in the LICENSE file and at http://www.apache.org/licenses/LICENSE-2.0.
+
+This software depends on third-party open-source components, each distributed
+under its own license, including (non-exhaustive):
+  - Microsoft Presidio (MIT)
+  - spaCy (MIT)
+  - FastAPI, Starlette, Pydantic (MIT)
+  - Next.js, React (MIT)
+  - Redis client, SQLAlchemy, structlog, cryptography

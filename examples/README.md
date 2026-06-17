@@ -1,11 +1,11 @@
 # Examples
 
-Runnable quickstarts for the Vaultex open packages.
+Runnable quickstarts for the ClawWarden open packages.
 
 | File | Shows |
 |------|-------|
-| `finsafe-quickstart.mjs` | Screening prompts for injection / jailbreak with `@vaultex/finsafe-core` |
-| `classify-quickstart.py` | Classifying data sensitivity with the `vaultex` Python package |
+| `finsafe-quickstart.mjs` | Screening prompts for injection / jailbreak with `@clawwarden/finsafe-core` |
+| `classify-quickstart.py` | Classifying data sensitivity with the `clawwarden` Python package |
 
 ## Run
 

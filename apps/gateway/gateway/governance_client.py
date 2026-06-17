@@ -1,6 +1,6 @@
 """Client for the shared Governance Service (AgentGuard).
 
-Vaultex is the *input governance* plane of the AI Trust Infrastructure Stack
+ClawWarden is the *input governance* plane of the AI Trust Infrastructure Stack
 (see AgentGuard ``MANIFESTO.md`` §0/§7). It ships audit events and evidence to
 the cross-cutting Governance Service so policy/audit/evidence have a single
 tamper-evident source of truth shared with the runtime plane.
@@ -11,7 +11,7 @@ Design notes
   a tokenize→LLM→detokenize request. Network/HTTP errors are logged and swallowed;
   the local Redis audit (``gateway/audit.py``) remains the in-process record.
 * **No-op when unconfigured.** If ``GOVERNANCE_URL``/``GOVERNANCE_API_KEY`` are
-  unset, every method returns ``None`` so Vaultex runs standalone.
+  unset, every method returns ``None`` so ClawWarden runs standalone.
 * Tenant scoping on the ``/v1`` surface is derived from the API key by the
   Governance Service, so the key alone identifies the tenant.
 

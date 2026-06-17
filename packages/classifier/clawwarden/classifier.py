@@ -1,7 +1,7 @@
 """Data-sensitivity classification (Gap 7).
 
 Open interface (`Pipeline`, `Classifier`) + a reference regex/NER pipeline. The
-proprietary Vaultex semantic classifier — and the BFSI sensitivity *taxonomy* —
+a custom semantic classifier — and the BFSI sensitivity *taxonomy* —
 implement the same `Pipeline` protocol and plug in unchanged.
 
 ⛔ The entity → sensitivity mapping below is a SOTA *placeholder*. The real BFSI

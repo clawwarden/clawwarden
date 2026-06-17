@@ -85,7 +85,7 @@ export function buildAuthorizationUrl(
     u.searchParams.set('code_challenge_method', opts.codeChallengeMethod ?? 'S256');
   } else {
     console.warn(
-      '[vaultex/oidc] buildAuthorizationUrl called without PKCE (codeChallenge). ' +
+      '[clawwarden/oidc] buildAuthorizationUrl called without PKCE (codeChallenge). ' +
         'Use createPkcePair() — PKCE is required for public clients.',
     );
   }

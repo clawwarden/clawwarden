@@ -1,6 +1,6 @@
 /**
- * @vaultex/sdk — thin client for AgentGuard (runtime monitoring) and the
- * Vaultex Governance Service. Uses the platform `fetch`; no runtime deps.
+ * @clawwarden/sdk — thin client for AgentGuard (runtime monitoring) and the
+ * ClawWarden Governance Service. Uses the platform `fetch`; no runtime deps.
  *
  * Authenticates with the `x-api-key` header (tenant is derived from the key).
  */
@@ -62,13 +62,13 @@ export interface AppendAuditInput {
   payload?: Record<string, unknown>;
 }
 
-export class VaultexApiError extends Error {
+export class ClawWardenApiError extends Error {
   constructor(
     message: string,
     readonly status: number,
   ) {
     super(message);
-    this.name = 'VaultexApiError';
+    this.name = 'ClawWardenApiError';
   }
 }
 
@@ -119,7 +119,7 @@ export class AgentGuardClient {
       });
       if (!res.ok) {
         const detail = await res.text().catch(() => '');
-        throw new VaultexApiError(
+        throw new ClawWardenApiError(
           `${method} ${path} failed (${res.status})${detail ? `: ${detail.slice(0, 200)}` : ''}`,
           res.status,
         );
@@ -152,7 +152,7 @@ export class AgentGuardClient {
       } catch (err) {
         lastError = err;
         const retryable =
-          !(err instanceof VaultexApiError) || isRetryableStatus(err.status);
+          !(err instanceof ClawWardenApiError) || isRetryableStatus(err.status);
         if (!retryable || attempt === this.maxRetries) break;
         await sleep(this.retryBackoffMs * 2 ** attempt);
       }

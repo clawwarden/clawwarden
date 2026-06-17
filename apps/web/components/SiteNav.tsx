@@ -8,11 +8,11 @@ const LINKS = [
   { label: "Platform", href: "/#platform" },
   { label: "Security", href: "/security" },
   { label: "Compliance", href: "/compliance" },
-  { label: "Pricing", href: "/pricing" },
+  { label: "Quickstart", href: "/setup" },
   { label: "About", href: "/about" },
 ];
 
-const GITHUB = "https://github.com/sammy995/vaultex";
+const GITHUB = "https://github.com/clawwarden/clawwarden";
 
 export default function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
@@ -50,7 +50,7 @@ export default function SiteNav() {
             className="display"
             style={{ fontSize: "1.4rem", fontWeight: 600, color: "var(--ink)", letterSpacing: "-0.01em" }}
           >
-            Vaultex
+            ClawWarden
           </span>
           <span className="rule-v hidden sm:inline-block" style={{ height: "20px" }} />
           <span className="eyebrow hidden sm:inline" style={{ fontSize: "0.6rem" }}>

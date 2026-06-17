@@ -1,6 +1,6 @@
 name: Deploy to Vercel (production)
 
-# Auto-deploys vaultex.space on every push to main, authenticated by the
+# Auto-deploys clawwarden.space on every push to main, authenticated by the
 # VERCEL_TOKEN repo secret. This bypasses Vercel's native git-integration
 # author check (which blocks on the GitHub-account ↔ Vercel-account mismatch),
 # so no manual `vercel --prod` / hand-minted tokens are needed.

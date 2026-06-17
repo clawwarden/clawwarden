@@ -18,7 +18,7 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - JWT_SECRET=${JWT_SECRET:-change-me-in-production-secret-key}
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,https://vaultex.space}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,https://clawwarden.space}
       - DB_PATH=/data/users.db
       # Credential-free NON-privileged tokens for the local/self-host demo
       # (vp_risk/admin are still refused). Secure-by-default: OFF unless enabled.

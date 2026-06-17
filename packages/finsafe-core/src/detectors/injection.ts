@@ -8,7 +8,7 @@ import {
 
 /**
  * Reference prompt-injection detector (OWASP LLM01). Heuristic pattern set —
- * an open baseline, NOT a complete defense. The proprietary Vaultex detector
+ * an open baseline, NOT a complete defense. a custom detector
  * implements the same `Detector` interface with tuned/ML detection.
  */
 const PATTERNS: Array<{ re: RegExp; severity: Severity; label: string }> = [

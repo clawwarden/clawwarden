@@ -1,4 +1,4 @@
-// Runtime safety screening with @vaultex/finsafe-core.
+// Runtime safety screening with @clawwarden/finsafe-core.
 // Run from the repo root after `npm install && npm run build`:
 //   node examples/finsafe-quickstart.mjs
 
@@ -6,7 +6,7 @@ import {
   DetectorRegistry,
   referenceDetectors,
   assessRisk,
-} from '@vaultex/finsafe-core';
+} from '@clawwarden/finsafe-core';
 
 const registry = new DetectorRegistry(referenceDetectors());
 

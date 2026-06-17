@@ -1,13 +1,13 @@
 {
-  "name": "vaultex",
+  "name": "clawwarden",
   "version": "0.1.0",
   "private": true,
   "description": "Open-source AI Trust Infrastructure for regulated enterprises",
   "license": "Apache-2.0",
-  "homepage": "https://vaultex.space",
+  "homepage": "https://clawwarden.space",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sammy995/vaultex"
+    "url": "https://github.com/clawwarden/clawwarden"
   },
   "type": "module",
   "workspaces": [

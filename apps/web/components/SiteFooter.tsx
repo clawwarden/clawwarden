@@ -7,15 +7,15 @@ const COLS: { title: string; links: [string, string, boolean?][] }[] = [
       ["Input governance", "/#platform"],
       ["Runtime & FIN-SAFE", "/security"],
       ["Governance engine", "/#governance"],
-      ["Pricing", "/pricing"],
+      ["Quickstart", "/setup"],
     ],
   },
   {
     title: "Open source",
     links: [
-      ["GitHub — vaultex", "https://github.com/sammy995/vaultex", true],
-      ["Contracts & API", "https://github.com/sammy995/vaultex/tree/main/contracts", true],
-      ["Report an issue", "https://github.com/sammy995/vaultex/issues", true],
+      ["GitHub — clawwarden", "https://github.com/clawwarden/clawwarden", true],
+      ["Contracts & API", "https://github.com/clawwarden/clawwarden/tree/main/contracts", true],
+      ["Report an issue", "https://github.com/clawwarden/clawwarden/issues", true],
     ],
   },
   {
@@ -52,7 +52,7 @@ export default function SiteFooter() {
         >
           <div style={{ maxWidth: "320px" }}>
             <span className="display" style={{ fontSize: "1.6rem", fontWeight: 600 }}>
-              Vaultex
+              ClawWarden
             </span>
             <p style={{ marginTop: "14px", fontSize: "0.92rem", lineHeight: 1.6, color: "var(--ink-soft)" }}>
               The trust layer between regulated enterprises and the LLMs they use. Input governance,
@@ -106,7 +106,7 @@ export default function SiteFooter() {
             color: "var(--ink-faint)",
           }}
         >
-          <span className="mono">© 2026 Vaultex — AI Trust Infrastructure</span>
+          <span className="mono">© 2026 ClawWarden — AI Trust Infrastructure</span>
           <span className="mono">GLBA · GDPR · SOC 2 · NIST AI RMF aligned</span>
         </div>
       </div>

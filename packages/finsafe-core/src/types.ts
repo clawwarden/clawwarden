@@ -1,6 +1,6 @@
 /**
  * Core FIN-SAFE types. These interfaces are the open contract; the proprietary
- * Vaultex detectors implement the same `Detector` interface with tuned models
+ * ClawWarden detectors implement the same `Detector` interface with tuned models
  * and scoring. See README.
  */
 

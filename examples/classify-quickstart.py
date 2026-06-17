@@ -1,10 +1,10 @@
-"""Data-sensitivity classification with the `vaultex` package.
+"""Data-sensitivity classification with the `clawwarden` package.
 
 Run after `pip install -e packages/classifier`:
     python examples/classify-quickstart.py
 """
 
-from vaultex import Classifier
+from clawwarden import Classifier
 
 clf = Classifier()
 

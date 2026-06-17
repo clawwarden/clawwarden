@@ -3,7 +3,7 @@
 Why this exists
 ---------------
 The core product promise is "PII never reaches the LLM." A single missed SSN
-reaching OpenAI is the exact catastrophe Vaultex exists to prevent. Without a
+reaching OpenAI is the exact catastrophe ClawWarden exists to prevent. Without a
 measured recall floor, nothing bounds the probability of that event.
 
 This module provides:
@@ -20,7 +20,7 @@ Add entries to LABELED_CORPUS: each entry is
     {"text": str, "entities": [{"entity_type": str, "value": str}, ...]}
 
 How to run with the full NER model (requires the 560 MB spaCy model):
-    VAULTEX_NER_EVAL=1 pytest tests/test_pii_recall.py -v
+    CLAWWARDEN_NER_EVAL=1 pytest tests/test_pii_recall.py -v
 
 ⛔ Halt-point (DB8 — detection recall SLO):
     The thresholds below are initial SOTA scaffolds derived from Presidio's

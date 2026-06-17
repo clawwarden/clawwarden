@@ -2,7 +2,7 @@
 
 ## Our pledge
 
-We as members, contributors, and leaders pledge to make participation in the Vaultex community a
+We as members, contributors, and leaders pledge to make participation in the ClawWarden community a
 harassment-free experience for everyone, regardless of age, body size, visible or invisible
 disability, ethnicity, sex characteristics, gender identity and expression, level of experience,
 education, socio-economic status, nationality, personal appearance, race, religion, or sexual
@@ -23,7 +23,7 @@ publishing others' private information without permission.
 ## Enforcement
 
 Instances of abusive or unacceptable behavior may be reported to the maintainers at
-**conduct@vaultex.space**. All complaints will be reviewed and investigated promptly and fairly.
+**conduct@clawwarden.space**. All complaints will be reviewed and investigated promptly and fairly.
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org),
 version 2.1.

@@ -13,7 +13,7 @@ Required by the pre-ship gate ("a P1 passes if explicitly risk-accepted in writi
 
 ### Context
 The web console ([apps/web](../apps/web)) is a **thin client that talks directly,
-cross-origin, to the user's own gateway** (`vaultex.space` → `http://localhost:8000`
+cross-origin, to the user's own gateway** (`clawwarden.space` → `http://localhost:8000`
 or a self-hosted gateway origin). This architecture constrains token storage:
 
 - **httpOnly cookies cannot replace localStorage here.** A cookie set by the
@@ -42,7 +42,7 @@ Accept storing the gateway-issued JWT in `localStorage` on the web console.
 - **HTTPS + HSTS** on the web origin.
 
 ### Residual risk
-An XSS on `vaultex.space` could read a live token and drive the victim's local
+An XSS on `clawwarden.space` could read a live token and drive the victim's local
 gateway for up to the token's remaining lifetime (≤ 4h). The strict CSP makes
 script injection substantially harder; no third-party scripts are loaded.
 

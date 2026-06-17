@@ -48,7 +48,7 @@ function safeSubject(s: string): string {
   return s.replace(/[\r\n<>]/g, "");
 }
 
-// Email notification is sent to hello@vaultex.space via the Resend API.
+// Email notification is sent to hello@clawwarden.space via the Resend API.
 // Set the RESEND_API_KEY environment variable in Vercel project settings.
 // Get a free key (100 emails/day) at https://resend.com
 //
@@ -61,14 +61,14 @@ async function sendEmailNotification(entry: WaitlistEntry): Promise<void> {
 
   const html = `
     <div style="font-family: sans-serif; max-width: 560px; background: #0a0f1e; color: #e2e8f0; padding: 32px; border-radius: 12px;">
-      <h2 style="color: #00d4ff; margin-top: 0;">New Vaultex Waitlist Signup</h2>
+      <h2 style="color: #00d4ff; margin-top: 0;">New ClawWarden Waitlist Signup</h2>
       <table style="width: 100%; border-collapse: collapse;">
         <tr><td style="padding: 8px 0; color: #94a3b8; width: 90px;">Email</td><td style="padding: 8px 0; font-weight: 600;">${esc(entry.email)}</td></tr>
         ${entry.company ? `<tr><td style="padding: 8px 0; color: #94a3b8;">Company</td><td style="padding: 8px 0;">${esc(entry.company)}</td></tr>` : ""}
         ${entry.role ? `<tr><td style="padding: 8px 0; color: #94a3b8;">Role</td><td style="padding: 8px 0;">${esc(entry.role)}</td></tr>` : ""}
         <tr><td style="padding: 8px 0; color: #94a3b8;">Time</td><td style="padding: 8px 0; font-size: 0.85em;">${esc(entry.timestamp)}</td></tr>
       </table>
-      <p style="margin-top: 24px; font-size: 0.8em; color: #64748b;">Sent by Vaultex waitlist API Â· vaultex.space</p>
+      <p style="margin-top: 24px; font-size: 0.8em; color: #64748b;">Sent by ClawWarden waitlist API Â· clawwarden.space</p>
     </div>
   `;
 
@@ -79,8 +79,8 @@ async function sendEmailNotification(entry: WaitlistEntry): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Vaultex Waitlist <waitlist@vaultex.space>",
-      to: ["hello@vaultex.space"],
+      from: "ClawWarden Waitlist <waitlist@clawwarden.space>",
+      to: ["hello@clawwarden.space"],
       subject: safeSubject(`New waitlist signup: ${entry.email}${entry.company ? ` (${entry.company})` : ""}`),
       html,
     }),
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
   // Always log (visible in Vercel function logs)
   console.log("[WAITLIST]", JSON.stringify(entry));
 
-  // Send email notification to hello@vaultex.space via Resend
+  // Send email notification to hello@clawwarden.space via Resend
   await sendEmailNotification(entry).catch(err =>
     console.error("[WAITLIST] Email notification error:", err)
   );

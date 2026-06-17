@@ -1,10 +1,10 @@
 # Architecture
 
-Vaultex is **AI trust infrastructure** for regulated enterprises, organized as three planes around
+ClawWarden is **AI trust infrastructure** for regulated enterprises, organized as three planes around
 one shared trust fabric.
 
 ```
-   data INTO models ─▶  VAULTEX (input governance)
+   data INTO models ─▶  CLAWWARDEN (input governance)
                          classify + tokenize PII/MNPI before any prompt leaves your network
                                     │
                                     │  audit + evidence
@@ -22,13 +22,13 @@ one shared trust fabric.
 
 ## The planes
 
-### Vaultex — input governance
-Keeps regulated data out of model prompts. The open `vaultex` Python package provides the
+### ClawWarden — input governance
+Keeps regulated data out of model prompts. The open `clawwarden` Python package provides the
 `Classifier` interface and a reference regex/NER pipeline; the proprietary semantic model and BFSI
 taxonomy plug in behind the same interface.
 
 ### AgentGuard + FIN-SAFE — runtime monitoring & safety
-Watches what models *do*. `@vaultex/finsafe-core` provides the `Detector` interface and reference
+Watches what models *do*. `@clawwarden/finsafe-core` provides the `Detector` interface and reference
 heuristics (prompt injection, PII leakage, jailbreak); tuned detectors and model-risk scoring are
 proprietary.
 
@@ -39,16 +39,16 @@ evidence proves it*. Defined by `contracts/` (OpenAPI + JSON-Schema). Key proper
 
 ## Data flow (a governed request)
 
-1. **Classify** the prompt (`vaultex`) → sensitivity + entities.
+1. **Classify** the prompt (`clawwarden`) → sensitivity + entities.
 2. **Tokenize** restricted data so the LLM never sees raw PII.
-3. **Screen** input with FIN-SAFE detectors (`@vaultex/finsafe-core`).
+3. **Screen** input with FIN-SAFE detectors (`@clawwarden/finsafe-core`).
 4. Call the model; **screen** the output for leakage.
 5. **Detokenize** for authorized roles only.
 6. Emit **audit + evidence** to the Governance Service via the SDKs.
 
 ## Observability & IAM
 
-`@vaultex/integrations` provides OpenTelemetry, Prometheus, Datadog, SIEM (syslog/Splunk HEC), and
+`@clawwarden/integrations` provides OpenTelemetry, Prometheus, Datadog, SIEM (syslog/Splunk HEC), and
 OIDC adapters so the stack plugs into existing enterprise tooling.
 
 See [plugging-in-the-core.md](./plugging-in-the-core.md) for how the proprietary providers attach.

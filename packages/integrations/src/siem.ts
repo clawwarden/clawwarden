@@ -36,7 +36,7 @@ export function formatSyslog(event: SiemEvent, opts: SyslogOptions = {}): string
   const pri = facility * 8 + severity;
   const ts = (event.timestamp ?? new Date()).toISOString();
   const host = opts.hostname ?? '-';
-  const app = opts.appName ?? 'vaultex';
+  const app = opts.appName ?? 'clawwarden';
   const sd = formatStructuredData(event.attributes);
   const eventType = sanitizeLine(event.eventType);
   const message = sanitizeLine(event.message);
@@ -53,13 +53,13 @@ function formatStructuredData(attrs?: Record<string, unknown>): string {
       return `${key}="${val}"`;
     })
     .join(' ');
-  return `[vaultex@0 ${pairs}]`;
+  return `[clawwarden@0 ${pairs}]`;
 }
 
 /**
  * Format an event as a Splunk HEC JSON envelope. Pure — testable.
  */
-export function formatHec(event: SiemEvent, source = 'vaultex'): string {
+export function formatHec(event: SiemEvent, source = 'clawwarden'): string {
   return JSON.stringify({
     time: Math.floor((event.timestamp ?? new Date()).getTime() / 1000),
     source,

@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vaultex"
+name = "clawwarden"
 version = "0.1.0"
-description = "Vaultex open SDK: data-sensitivity classifier (reference pipeline) + Governance Service client"
+description = "ClawWarden open SDK: data-sensitivity classifier (reference pipeline) + Governance Service client"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }
@@ -18,8 +18,8 @@ dependencies = [
 dev = ["pytest>=7"]
 
 [project.urls]
-Homepage = "https://vaultex.space"
-Repository = "https://github.com/sammy995/vaultex"
+Homepage = "https://clawwarden.space"
+Repository = "https://github.com/clawwarden/clawwarden"
 
 [tool.setuptools.packages.find]
-include = ["vaultex*"]
+include = ["clawwarden*"]

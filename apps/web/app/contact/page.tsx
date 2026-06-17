@@ -32,7 +32,7 @@ export default function ContactPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
       setStatus("ok");
-      setMsg("Thanks — we've received it and will reply from hello@vaultex.space.");
+      setMsg("Thanks — we've received it and will reply from hello@clawwarden.space.");
     } catch (err) {
       setStatus("err");
       setMsg(err instanceof Error ? err.message : "Please try again.");
@@ -79,15 +79,15 @@ export default function ContactPage() {
               </p>
 
               <div style={{ marginTop: "36px", display: "flex", flexDirection: "column", gap: "18px" }}>
-                <a href="mailto:hello@vaultex.space" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
+                <a href="mailto:hello@clawwarden.space" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
                   <Mail size={18} color="var(--vault)" />
-                  <span><strong>hello@vaultex.space</strong> — general & sales</span>
+                  <span><strong>hello@clawwarden.space</strong> — general & sales</span>
                 </a>
-                <a href="mailto:security@vaultex.space" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
+                <a href="mailto:security@clawwarden.space" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
                   <ShieldCheck size={18} color="var(--vault)" />
-                  <span><strong>security@vaultex.space</strong> — responsible disclosure</span>
+                  <span><strong>security@clawwarden.space</strong> — responsible disclosure</span>
                 </a>
-                <a href="https://github.com/sammy995/vaultex" target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
+                <a href="https://github.com/clawwarden/clawwarden" target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: "12px", alignItems: "center", textDecoration: "none", color: "var(--ink)" }}>
                   <Star size={18} color="var(--vault)" />
                   <span><strong>GitHub</strong> — audit the open-source code</span>
                 </a>
