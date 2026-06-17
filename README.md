@@ -16,9 +16,15 @@ API key or run a local model — you hold the keys and the data.
 [![CI](https://github.com/clawwarden/clawwarden/actions/workflows/ci.yml/badge.svg)](https://github.com/clawwarden/clawwarden/actions/workflows/ci.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 
-[Quickstart](#quickstart) · [How it works](#how-it-works) · [Why](#why) · [Layout](#repo-layout) · [Contributing](#contributing)
+[Quickstart](#quickstart) · [How it works](#how-it-works) · [White paper](docs/whitepaper.md) · [Why](#why) · [Layout](#repo-layout) · [Contributing](#contributing)
 
 </div>
+
+<p align="center">
+  <img src="demo/demo.gif" alt="ClawWarden demo — tokenize PII, role-aware detokenize, tamper-evident audit" width="760">
+  <br>
+  <sub><a href="demo/">Reproduce this demo</a>: <code>pip install clawwarden && python demo/demo.py</code></sub>
+</p>
 
 ---
 
