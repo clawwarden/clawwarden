@@ -14,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from gateway.audit import AuditLogger, EventType
+from gateway.audit_store import DurableAuditStore
 from gateway.auth import issue_token, validate_token
 from gateway.config import assert_secure_secret, settings
 from gateway.database import get_db, init_db
@@ -59,7 +60,21 @@ init_sentry()
 
 store: SessionStore | None = None
 audit_log: AuditLogger | None = None
-limiter = Limiter(key_func=get_remote_address)
+
+
+def _rate_limit_key(request: Request) -> str:
+    """Rate-limit key: the real client IP. Behind a trusted proxy (TRUST_PROXY),
+    use the first X-Forwarded-For hop instead of the shared proxy IP (R3).
+    XFF is honoured only when TRUST_PROXY is set, so it cannot be spoofed to
+    evade limits in the default (no-proxy) posture."""
+    if settings.trust_proxy:
+        xff = request.headers.get("x-forwarded-for")
+        if xff:
+            return xff.split(",")[0].strip()
+    return get_remote_address(request)
+
+
+limiter = Limiter(key_func=_rate_limit_key)
 
 
 @asynccontextmanager
@@ -68,7 +83,9 @@ async def lifespan(app: FastAPI):
     assert_secure_secret()  # DB4: fail closed in prod on a default/weak JWT secret
     init_db()  # create users table if not exists
     store = SessionStore(settings.redis_url)
-    audit_log = AuditLogger(store.redis)
+    # Attach the durable append-only SQL mirror (R1 WORM anchor) so the audit
+    # chain survives even a full Redis compromise.
+    audit_log = AuditLogger(store.redis, durable=DurableAuditStore())
     log.info("gateway_startup", redis_url=settings.redis_url)
     yield
     await store.close()

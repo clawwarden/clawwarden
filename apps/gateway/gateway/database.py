@@ -28,7 +28,18 @@ local dev and CI stay zero-friction.
 import os
 from pathlib import Path
 
-from sqlalchemy import Column, DateTime, String, create_engine, func, text
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    create_engine,
+    func,
+    text,
+)
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 # DB6: If DATABASE_URL is set, use it (Postgres in production).
@@ -65,9 +76,64 @@ class User(Base):
     # tenant_id = Column(String, nullable=False, default="default", index=True)
 
 
+class AuditEntry(Base):
+    """Durable, append-only mirror of the hash-chained audit log (R1 WORM anchor).
+
+    One continuous per-tenant chain (``seq`` monotonic, ``prev_hash`` links to the
+    previous entry across day boundaries) — so deleting "a day" is not even a
+    concept here, and any gap breaks the chain. On Postgres an UPDATE/DELETE
+    trigger makes the table truly append-only (WORM); see ``install_worm_guard``.
+    """
+
+    __tablename__ = "audit_entries"
+    __table_args__ = (UniqueConstraint("tenant_id", "seq", name="uq_audit_tenant_seq"),)
+
+    id = Column(String, primary_key=True)
+    tenant_id = Column(String, nullable=False, index=True)
+    seq = Column(BigInteger, nullable=False)
+    timestamp = Column(String, nullable=False)
+    event_type = Column(String, nullable=False)
+    correlation_id = Column(String, nullable=True)
+    session_id = Column(String, nullable=True)
+    role = Column(String, nullable=True)
+    details = Column(Text, nullable=False, default="{}")  # canonical JSON
+    prev_hash = Column(String, nullable=False)
+    entry_hash = Column(String, nullable=False, index=True)
+    created_at = Column(DateTime, server_default=func.now())
+
+
+# Postgres trigger that rejects any UPDATE or DELETE on the audit table, making it
+# genuinely append-only (WORM). No-op on SQLite (dev/CI) — true WORM needs Postgres.
+_WORM_TRIGGER_SQL = """
+CREATE OR REPLACE FUNCTION vaultex_audit_no_mutate() RETURNS trigger AS $$
+BEGIN
+  RAISE EXCEPTION 'audit_entries is append-only (WORM): % blocked', TG_OP;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_audit_no_mutate ON audit_entries;
+CREATE TRIGGER trg_audit_no_mutate
+  BEFORE UPDATE OR DELETE ON audit_entries
+  FOR EACH ROW EXECUTE FUNCTION vaultex_audit_no_mutate();
+"""
+
+
+def install_worm_guard() -> bool:
+    """Install the append-only trigger on Postgres. Returns True if installed."""
+    if engine.dialect.name != "postgresql":
+        return False
+    with engine.begin() as conn:
+        conn.execute(text(_WORM_TRIGGER_SQL))
+    return True
+
+
 def init_db() -> None:
-    """Create all tables if they don't exist yet."""
+    """Create all tables if they don't exist yet, and install the WORM guard."""
     Base.metadata.create_all(bind=engine)
+    try:
+        install_worm_guard()
+    except Exception:  # noqa: BLE001 - never block startup on the optional guard
+        pass
 
 
 def get_db():

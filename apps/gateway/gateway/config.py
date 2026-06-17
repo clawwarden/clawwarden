@@ -73,6 +73,12 @@ class Settings(BaseSettings):
     # (169.254.x) is ALWAYS blocked. See gateway/ssrf.py.
     ollama_url_allowlist: str = ""
 
+    # R3: when the gateway runs behind a trusted reverse proxy that sets
+    # X-Forwarded-For, enable this so rate limits key on the real client IP
+    # instead of the shared proxy IP. Keep OFF unless a trusted proxy is in front
+    # (otherwise clients could spoof XFF to evade limits).
+    trust_proxy: bool = False
+
     # Error tracking (Sentry) — opt-in. Empty DSN = disabled (no-op). PII is
     # never sent (send_default_pii=False + scrubbing); see gateway/observability.py.
     sentry_dsn: str = ""

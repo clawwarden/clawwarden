@@ -43,8 +43,11 @@ class FakeAsyncRedis:
     async def get(self, key):
         return self.kv.get(key)
 
-    async def set(self, key, value):
+    async def set(self, key, value, nx=False, ex=None):
+        if nx and key in self.kv:
+            return None  # not set — another writer already holds the key
         self.kv[key] = value
+        return True
 
     async def setex(self, key, ttl, value):
         self.kv[key] = value

@@ -114,8 +114,15 @@ class SessionStore:
         await self.redis.expire(counter_key, self.TTL)
 
         token = f"{{{{{short}_{count}}}}}"
-        await self.redis.setex(hash_key, self.TTL, token)
-        return token
+        # Atomic claim (R4): only the first of two concurrent callers for the same
+        # value wins the SET NX; the loser reads the winner's token instead of
+        # minting a second token for one value. A skipped counter value is a
+        # harmless gap in numbering.
+        won = await self.redis.set(hash_key, token, nx=True, ex=self.TTL)
+        if won:
+            return token
+        winner = await self.redis.get(hash_key)
+        return winner if winner else token
 
     async def close(self) -> None:
         await self.redis.aclose()

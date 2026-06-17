@@ -102,10 +102,13 @@ class AuditLogger:
         ttl_days:     Retention window for each day's log list (None = no TTL).
     """
 
-    def __init__(self, redis_client, tenant_id: str = "default", ttl_days: int = 30):
+    def __init__(self, redis_client, tenant_id: str = "default", ttl_days: int = 30,
+                 durable=None):
         self.redis = redis_client
         self.tenant_id = tenant_id
         self.ttl = ttl_days * 24 * 3600 if ttl_days else None
+        # Optional DurableAuditStore (append-only SQL mirror — the WORM anchor).
+        self.durable = durable
 
     def _day_key(
         self, date_str: Optional[str] = None, tenant_id: Optional[str] = None
@@ -133,9 +136,24 @@ class AuditLogger:
         open (a shorter chain is internally consistent)."""
         return f"{day_key}:watermark"
 
-    async def _get_prev_hash(self, day_key: str) -> str:
-        """Return the hash of the last written entry, or the genesis sentinel."""
-        stored = await self.redis.get(self._chain_cursor_key(day_key))
+    def _tip_key(self, tenant: str) -> str:
+        """Continuous per-tenant chain tip — the last entry hash across ALL days.
+        Linking each entry to this (not a per-day genesis) makes the chain span
+        day boundaries, so deleting a whole day breaks the next day's link."""
+        return f"audit:{tenant}:chain_tip"
+
+    def _global_seq_key(self, tenant: str) -> str:
+        """Monotonic per-tenant sequence for the durable cross-day chain."""
+        return f"audit:{tenant}:gseq"
+
+    def _day_genesis_key(self, day_key: str) -> str:
+        """The cross-day link a day starts from (the prior day's last hash), so
+        per-day verify can validate the first entry's prev_hash."""
+        return f"{day_key}:genesis"
+
+    async def _get_prev_hash(self, tenant: str) -> str:
+        """Return the continuous chain tip, or the genesis sentinel if empty."""
+        stored = await self.redis.get(self._tip_key(tenant))
         return stored if stored else GENESIS_SENTINEL
 
     async def log_event(
@@ -159,7 +177,8 @@ class AuditLogger:
         """
         effective_tenant = tenant_id or self.tenant_id
         day_key = self._day_key(tenant_id=effective_tenant)
-        prev_hash = await self._get_prev_hash(day_key)
+        # Continuous (cross-day) link: prev = the tenant's last entry hash.
+        prev_hash = await self._get_prev_hash(effective_tenant)
 
         body = {
             "id": str(uuid.uuid4()),
@@ -175,27 +194,35 @@ class AuditLogger:
         entry_hash = _entry_hmac(_canonical(body))
         entry = {**body, "entry_hash": entry_hash}
 
-        # Advance the monotonic append counter and sign a high-water mark over
-        # (count, last_hash). Detached from the list so truncating the list does
-        # not roll it back; HMAC means it cannot be forged for a shorter chain.
+        # Continuous per-tenant sequence (durable cross-day chain) + per-day seq
+        # and signed high-water mark (operational tail-truncation guard).
+        gseq = await self.redis.incr(self._global_seq_key(effective_tenant))
         seq = await self.redis.incr(self._seq_key(day_key))
         watermark = f"{seq}:{_entry_hmac(f'{seq}:{entry_hash}')}"
+        # Record the day's cross-day genesis on its first entry.
+        day_first = (await self.redis.get(self._day_genesis_key(day_key))) is None
 
         raw = json.dumps(entry)
         pipe = self.redis.pipeline()
         pipe.rpush(day_key, raw)
-        # Advance the chain cursor + watermark — same TTL as the list.
         pipe.set(self._chain_cursor_key(day_key), entry_hash)
         pipe.set(self._watermark_key(day_key), watermark)
+        # Advance the continuous tip — NOT expired, so the chain spans retention.
+        pipe.set(self._tip_key(effective_tenant), entry_hash)
+        if day_first:
+            pipe.set(self._day_genesis_key(day_key), prev_hash)
         if self.ttl:
             pipe.expire(day_key, self.ttl)
             pipe.expire(self._chain_cursor_key(day_key), self.ttl)
             pipe.expire(self._watermark_key(day_key), self.ttl)
             pipe.expire(self._seq_key(day_key), self.ttl)
+            pipe.expire(self._day_genesis_key(day_key), self.ttl)
         await pipe.execute()
 
-        # ⛔ Halt-point: call _persist_to_worm(entry) here once S3 Object Lock
-        # or the Postgres append-only table backend is wired by the founder.
+        # Durable append-only mirror (R1 WORM anchor) — best-effort; the store
+        # itself swallows + logs failures so audit never breaks a request.
+        if self.durable is not None:
+            self.durable.append(entry, gseq)
 
         log.debug("audit_event", event_type=event_type, correlation_id=correlation_id)
 
@@ -245,7 +272,10 @@ class AuditLogger:
         raw_entries = await self.redis.lrange(key, 0, -1)
         parsed = [json.loads(e) for e in raw_entries]
 
-        prev = GENESIS_SENTINEL
+        # The chain is continuous across days: a day starts from its recorded
+        # genesis (the prior day's last hash), not the global sentinel.
+        day_genesis = await self.redis.get(self._day_genesis_key(key))
+        prev = day_genesis if day_genesis else GENESIS_SENTINEL
         for i, entry in enumerate(parsed):
             stored_entry_hash = entry.get("entry_hash", "")
             stored_prev_hash = entry.get("prev_hash", "")
@@ -301,3 +331,14 @@ class AuditLogger:
                 }
 
         return {"ok": True, "entries": len(parsed), "first_bad": -1, "error": None}
+
+    async def verify_durable(self, tenant_id: Optional[str] = None) -> Optional[dict]:
+        """Verify the durable, append-only chain (the regulator-grade WORM anchor).
+
+        Walks the full continuous per-tenant chain in the SQL mirror, so a deleted
+        entry or whole day — anything that leaves a seq gap or breaks a link — is
+        detected. Returns ``None`` when no durable store is attached.
+        """
+        if self.durable is None:
+            return None
+        return self.durable.verify_chain(tenant_id or self.tenant_id)
