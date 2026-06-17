@@ -27,9 +27,13 @@ Runs anywhere with Python 3.9+ and the standard library — no Redis, no model, 
 
 ## Regenerate the GIF
 
-The README embeds `demo/demo.gif`. To rebuild it, install
-[VHS](https://github.com/charmbracelet/vhs) and run:
+The README embeds `demo/demo.gif`. Two ways to rebuild it:
 
 ```bash
+# Easiest — pure Pillow, no extra tools:
+python -m pip install pillow
+python demo/make_gif.py
+
+# Or a real terminal recording with VHS (https://github.com/charmbracelet/vhs):
 vhs demo/demo.tape
 ```
