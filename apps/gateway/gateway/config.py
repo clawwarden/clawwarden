@@ -73,6 +73,23 @@ class Settings(BaseSettings):
     # (169.254.x) is ALWAYS blocked. See gateway/ssrf.py.
     ollama_url_allowlist: str = ""
 
+    # Item 3: external WORM anchor (S3 Object Lock). When audit_s3_bucket is set,
+    # every audit entry is ALSO written as a write-once, Object-Locked S3 object —
+    # immutable outside the database, closing the white-paper §8 residual (a
+    # privileged operator who could drop the Postgres table). Empty bucket = the
+    # S3 anchor is disabled and only the Postgres/SQLite mirror runs (back-compat).
+    # The bucket MUST have Object Lock enabled at creation (it cannot be added
+    # later). ⛔ Halt-point: retention_days is a compliance decision — the 7-year
+    # default matches SEC 17a-4 / FINRA 4370; confirm your schedule before deploy.
+    audit_s3_bucket: str = ""
+    audit_s3_prefix: str = "audit"
+    audit_s3_retention_days: int = 2556
+    audit_s3_region: str = ""
+    # Optional custom endpoint for S3-compatible stores (MinIO, LocalStack). Leave
+    # empty for AWS S3. Credentials come from the standard AWS chain (IAM role /
+    # env / profile) — never put keys in this file.
+    audit_s3_endpoint_url: str = ""
+
     # R3: when the gateway runs behind a trusted reverse proxy that sets
     # X-Forwarded-For, enable this so rate limits key on the real client IP
     # instead of the shared proxy IP. Keep OFF unless a trusted proxy is in front

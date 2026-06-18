@@ -178,6 +178,40 @@ export async function getAuditLogs(
 }
 
 // ---------------------------------------------------------------------------
+// Audit tamper-evidence verification (admin only)
+// ---------------------------------------------------------------------------
+
+export interface ChainCheck {
+  ok: boolean;
+  entries: number;
+  first_bad: number;
+  error: string | null;
+  /** Set by MultiAnchor: the first anchor that diverged. */
+  anchor?: string;
+  /** Set by MultiAnchor: per-anchor outcome keyed by anchor class name. */
+  anchors?: Record<string, ChainCheck>;
+}
+
+export interface VerifyResult {
+  ok: boolean;
+  date: string;
+  /** Per-day Redis hash chain + signed high-water mark. */
+  redis_chain: ChainCheck;
+  /** Continuous WORM anchor(s) — Postgres mirror and, when configured, S3 Object Lock. null if no durable store. */
+  durable: ChainCheck | null;
+}
+
+export async function verifyAudit(jwt: string, date?: string): Promise<VerifyResult> {
+  const url = new URL(`${GATEWAY_URL}/api/audit/verify`);
+  if (date) url.searchParams.set("date", date);
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${jwt}` },
+  });
+  if (!res.ok) throw new Error(`Verify error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
 // User auth (real DB — /api/users/*)
 // ---------------------------------------------------------------------------
 

@@ -1,8 +1,15 @@
 services:
   redis:
     image: redis:7-alpine
+    # Item 2 (durability): AOF on with per-second fsync so the token vault +
+    # audit chain-tip survive a restart/crash (RPO ≤ 1s). The data volume below
+    # persists the AOF. For production HA see docs/runbooks/ha-dr-runbook.md
+    # (replica + Sentinel or managed Redis).
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -39,3 +46,4 @@ services:
 
 volumes:
   gateway_data:
+  redis_data:

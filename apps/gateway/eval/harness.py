@@ -131,3 +131,57 @@ def evaluate(corpus: list[dict], detect: Detector) -> dict:
         },
         "false_positive_examples": false_positive_examples,
     }
+
+
+def evaluate_by_domain(corpus: list[dict], detect: Detector) -> dict:
+    """Run ``evaluate`` overall AND per ``domain`` (Item 1).
+
+    Returns ``{"overall": <result>, "by_domain": {domain: <result>, ...}}``.
+    Examples without a ``domain`` key are grouped under ``"unspecified"``. A
+    per-domain breakdown is what a regulated buyer needs — a single micro-average
+    can hide a domain where recall quietly collapses.
+    """
+    groups: dict[str, list[dict]] = {}
+    for ex in corpus:
+        groups.setdefault(ex.get("domain", "unspecified"), []).append(ex)
+    return {
+        "overall": evaluate(corpus, detect),
+        "by_domain": {d: evaluate(items, detect) for d, items in sorted(groups.items())},
+    }
+
+
+def check_slo(
+    result: dict,
+    *,
+    max_leak_rate: float = 0.0,
+    min_recall: float = 1.0,
+) -> tuple[bool, list[str]]:
+    """Gate an eval result against the product SLO. Returns ``(ok, violations)``.
+
+    Checks the overall residual-leak rate and micro-recall, AND every per-domain
+    breakdown when ``result`` came from :func:`evaluate_by_domain` — so a single
+    bad domain fails the gate even if the average looks fine. Drives the CI gate
+    in ``run_eval.py`` (non-zero exit on violation).
+    """
+    violations: list[str] = []
+
+    def _check(scope: str, res: dict) -> None:
+        leak = res["residual_leak"]["rate"]
+        recall = res["micro"]["recall"]
+        if leak > max_leak_rate:
+            violations.append(
+                f"{scope}: residual-leak {leak:.4%} > max {max_leak_rate:.4%}"
+            )
+        if recall < min_recall:
+            violations.append(
+                f"{scope}: micro-recall {recall:.4%} < min {min_recall:.4%}"
+            )
+
+    if "overall" in result and "by_domain" in result:
+        _check("overall", result["overall"])
+        for domain, res in result["by_domain"].items():
+            _check(f"domain[{domain}]", res)
+    else:
+        _check("overall", result)
+
+    return (not violations), violations

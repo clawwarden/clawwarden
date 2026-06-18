@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Shield,
+  ShieldCheck,
+  ShieldAlert,
   Activity,
   RefreshCw,
   ChevronLeft,
@@ -11,7 +13,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { getJWT, getRole } from "@/lib/session";
-import { getAuditLogs, type AuditEntry } from "@/lib/api";
+import { getAuditLogs, verifyAudit, type AuditEntry, type VerifyResult } from "@/lib/api";
 
 // ---------------------------------------------------------------------------
 // Event type styling
@@ -164,6 +166,92 @@ function LogRow({ entry }: { entry: AuditEntry }) {
 }
 
 // ---------------------------------------------------------------------------
+// Tamper-evidence verification banner
+// ---------------------------------------------------------------------------
+
+const ANCHOR_LABELS: Record<string, string> = {
+  DurableAuditStore: "Postgres WORM mirror",
+  S3ObjectLockAnchor: "S3 Object Lock",
+};
+
+function VerifyBanner({ result }: { result: VerifyResult }) {
+  const ok = result.ok;
+  const color = ok ? "var(--color-safe, #0d5a40)" : "var(--color-danger, #b3261e)";
+  const bg = ok ? "rgba(13,90,64,0.08)" : "rgba(255,68,68,0.08)";
+  const Icon = ok ? ShieldCheck : ShieldAlert;
+
+  // Flatten checks into rows: the Redis chain, then each durable anchor (or the
+  // single durable result when not a MultiAnchor).
+  const rows: { label: string; ok: boolean; entries: number; error: string | null }[] = [
+    {
+      label: "Redis hash chain",
+      ok: result.redis_chain.ok,
+      entries: result.redis_chain.entries,
+      error: result.redis_chain.error,
+    },
+  ];
+  if (result.durable) {
+    if (result.durable.anchors) {
+      for (const [name, r] of Object.entries(result.durable.anchors)) {
+        rows.push({ label: ANCHOR_LABELS[name] ?? name, ok: r.ok, entries: r.entries, error: r.error });
+      }
+    } else {
+      rows.push({
+        label: ANCHOR_LABELS["DurableAuditStore"],
+        ok: result.durable.ok,
+        entries: result.durable.entries,
+        error: result.durable.error,
+      });
+    }
+  }
+
+  return (
+    <div style={{ padding: "12px 20px", background: bg, borderBottom: `1px solid ${color}33` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: rows.length ? "8px" : 0 }}>
+        <Icon size={16} style={{ color }} />
+        <span style={{ color, fontWeight: 700, fontSize: "0.85rem" }}>
+          {ok
+            ? `Integrity verified — every link checks out (${result.date}).`
+            : "TAMPER DETECTED — the audit record was altered."}
+        </span>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {rows.map((r) => {
+          const rc = r.ok ? "var(--color-safe, #0d5a40)" : "var(--color-danger, #b3261e)";
+          return (
+            <span
+              key={r.label}
+              title={r.error ?? undefined}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "0.72rem",
+                fontFamily: "var(--font-mono)",
+                fontWeight: 600,
+                color: rc,
+                background: "rgba(0,0,0,0.04)",
+                border: `1px solid ${rc}33`,
+                borderRadius: "4px",
+                padding: "3px 8px",
+              }}
+            >
+              {r.ok ? "✓" : "✗"} {r.label}
+              <span style={{ color: "var(--text-muted)" }}>{r.entries} entries</span>
+            </span>
+          );
+        })}
+      </div>
+      {!ok && (
+        <p style={{ color: "var(--color-danger, #b3261e)", fontSize: "0.74rem", marginTop: "8px", fontFamily: "var(--font-mono)" }}>
+          {result.durable?.error ?? result.redis_chain.error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -175,6 +263,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [access, setAccess] = useState<"checking" | "denied" | "ok">("checking");
+  const [verify, setVerify] = useState<VerifyResult | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const fetchLogs = useCallback(
     async (jwt: string) => {
@@ -188,6 +278,22 @@ export default function AdminPage() {
         setError(String(e));
       } finally {
         setLoading(false);
+      }
+    },
+    [date]
+  );
+
+  const runVerify = useCallback(
+    async (jwt: string) => {
+      setVerifying(true);
+      setError("");
+      try {
+        setVerify(await verifyAudit(jwt, date || undefined));
+      } catch (e: unknown) {
+        setVerify(null);
+        setError(String(e));
+      } finally {
+        setVerifying(false);
       }
     },
     [date]
@@ -371,6 +477,23 @@ export default function AdminPage() {
           {loading ? "Loading…" : "Refresh"}
         </button>
 
+        <button
+          className="btn-ghost"
+          onClick={() => runVerify(jwt)}
+          disabled={verifying}
+          title="Walk the hash chain + WORM anchor(s) and prove no entry was altered, reordered, or deleted"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "0.8rem",
+            padding: "6px 12px",
+          }}
+        >
+          <ShieldCheck size={13} style={{ animation: verifying ? "spin 1s linear infinite" : "none" }} />
+          {verifying ? "Verifying…" : "Verify integrity"}
+        </button>
+
         <span
           style={{
             marginLeft: "auto",
@@ -401,6 +524,9 @@ export default function AdminPage() {
           {error}
         </div>
       )}
+
+      {/* Tamper-evidence verification result */}
+      {verify && <VerifyBanner result={verify} />}
 
       {/* Breakdown bar */}
       <BreakdownBar logs={logs} />

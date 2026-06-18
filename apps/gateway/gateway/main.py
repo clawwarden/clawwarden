@@ -14,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from gateway.audit import AuditLogger, EventType
+from gateway.audit_anchor import MultiAnchor, S3ObjectLockAnchor
 from gateway.audit_store import DurableAuditStore
 from gateway.auth import issue_token, validate_token
 from gateway.config import assert_secure_secret, settings
@@ -84,8 +85,22 @@ async def lifespan(app: FastAPI):
     init_db()  # create users table if not exists
     store = SessionStore(settings.redis_url)
     # Attach the durable append-only SQL mirror (R1 WORM anchor) so the audit
-    # chain survives even a full Redis compromise.
-    audit_log = AuditLogger(store.redis, durable=DurableAuditStore())
+    # chain survives even a full Redis compromise. When an Object-Lock bucket is
+    # configured (Item 3), ALSO mirror to S3 — an immutable anchor outside the DB.
+    anchor = DurableAuditStore()
+    if settings.audit_s3_bucket:
+        anchor = MultiAnchor([
+            anchor,
+            S3ObjectLockAnchor(
+                settings.audit_s3_bucket,
+                prefix=settings.audit_s3_prefix,
+                retention_days=settings.audit_s3_retention_days,
+                region=settings.audit_s3_region or None,
+                endpoint_url=settings.audit_s3_endpoint_url or None,
+            ),
+        ])
+        log.info("audit_s3_anchor_enabled", bucket=settings.audit_s3_bucket)
+    audit_log = AuditLogger(store.redis, durable=anchor)
     log.info("gateway_startup", redis_url=settings.redis_url)
     yield
     await store.close()
@@ -432,6 +447,43 @@ async def get_audit_logs(
     return {"logs": logs, "count": len(logs), "date": date or "today"}
 
 
+@app.get("/api/audit/verify")
+async def verify_audit(
+    request: Request,
+    date: Optional[str] = None,
+    admin: dict = Depends(_require_admin),
+):
+    """Verify the tamper-evidence of the audit trail (admin role required).
+
+    Runs both checks and reports each so a regulator/operator can see the proof,
+    not just a boolean:
+      - ``redis_chain``: the per-day hash chain + signed high-water mark (fast).
+      - ``durable``:     the continuous WORM anchor(s) — Postgres mirror and, when
+        configured, the S3 Object Lock anchor (regulator-grade). With a MultiAnchor
+        the per-anchor outcome is under ``durable.anchors`` and ``durable.anchor``
+        names the first that diverged.
+    ``ok`` is the AND of every check. A false here is a tamper signal — page on it.
+    """
+    correlation_id = _correlation_id(request)
+    tenant = admin.get("tenant", "default")
+    await audit_log.log_event(
+        EventType.ADMIN_ACCESS,
+        correlation_id=correlation_id,
+        role=admin.get("role"),
+        tenant_id=tenant,
+        details={"action": "verify_audit", "date": date},
+    )
+    redis_chain = await audit_log.verify_chain(date=date, tenant_id=tenant)
+    durable = await audit_log.verify_durable(tenant_id=tenant)
+    overall_ok = bool(redis_chain.get("ok")) and (durable is None or bool(durable.get("ok")))
+    return {
+        "ok": overall_ok,
+        "date": date or "today",
+        "redis_chain": redis_chain,
+        "durable": durable,
+    }
+
+
 @app.post("/v1/chat/completions")
 @limiter.limit("20/minute")
 async def chat_completions(
@@ -472,8 +524,18 @@ async def chat_completions(
 
     allowed_entities = get_role_permissions(role)
 
-    # 2. Load provider config
-    config = await store.get_provider_config(x_session_id)
+    # 2. Load provider config + session owner. FAIL CLOSED on a vault (Redis)
+    # outage: a store error blocks the request with a clean 503 instead of an
+    # unhandled 500 that could leak internals — and, critically, control never
+    # reaches the LLM call below, so no prompt is forwarded in the clear (Item 2).
+    try:
+        config = await store.get_provider_config(x_session_id)
+        owner = await store.get_session_owner(x_session_id)
+    except Exception as exc:  # noqa: BLE001
+        log.error("vault_unavailable", error=str(exc), session_id=x_session_id)
+        raise HTTPException(
+            503, "Session vault unavailable — request blocked for safety."
+        )
     if not config:
         raise HTTPException(
             404, "Session not found or expired. Please reconfigure the gateway."
@@ -482,7 +544,6 @@ async def chat_completions(
     # DB3: the X-Session-ID must belong to the authenticated caller. Without this
     # any valid token could drive another user's/tenant's session and detokenize
     # their PII (IDOR). Fail closed if the owner record is missing or mismatched.
-    owner = await store.get_session_owner(x_session_id)
     if (
         not owner
         or owner.get("sub") != payload.get("sub")

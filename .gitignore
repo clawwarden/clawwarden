@@ -35,3 +35,23 @@ coverage/
 htmlcov/
 
 .vercel
+
+# Production-readiness artifacts that must NEVER be committed
+# Real-PII eval corpora (synthetic/public corpora ARE committed; real data stays local)
+**/eval/corpora/private/
+**/eval/**/*.real.*
+*.pii.jsonl
+*.pii.json
+# Cryptographic key material (Fernet/MultiFernet, signing keys)
+*.key
+*.pem
+fernet*.keys
+keys/
+# Redis / vault backups
+*.rdb
+*.aof
+dump.rdb
+backups/
+# Confidential security deliverables (publish only the summary)
+**/security/**/*-confidential.*
+**/pentest/*-full.*

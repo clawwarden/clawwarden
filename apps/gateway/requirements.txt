@@ -16,3 +16,6 @@ psycopg2-binary==2.9.10
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.20
 sentry-sdk[fastapi]>=2.0,<3
+# Item 3: external WORM anchor (S3 Object Lock). Only used when AUDIT_S3_BUCKET is
+# set; the anchor lazy-imports boto3 so non-S3 deployments never load it.
+boto3==1.35.76

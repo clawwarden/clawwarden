@@ -17,7 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from eval.corpus import LABELED_CORPUS
-from eval.harness import evaluate
+from eval.harness import check_slo, evaluate, evaluate_by_domain
+from eval.synthetic import generate_corpus
 
 # Repo-root docs/eval (apps/gateway/eval/run_eval.py -> ../../../docs/eval)
 DOCS_EVAL = Path(__file__).resolve().parents[3] / "docs" / "eval"
@@ -75,11 +76,40 @@ def _markdown(mode: str, r: dict) -> str:
     return "\n".join(lines)
 
 
+def _domain_markdown(by_domain: dict) -> str:
+    lines = ["", "#### Per-domain residual-leak / recall", "",
+             "| Domain | Examples | Micro recall | Residual-leak |",
+             "|---|--:|--:|--:|"]
+    for d, r in sorted(by_domain.items()):
+        lines.append(f"| {d} | {r['examples']} | {_fmt_pct(r['micro']['recall'])} | "
+                     f"{_fmt_pct(r['residual_leak']['rate'])} |")
+    return "\n".join(lines) + "\n"
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["ner", "regex", "both"], default="both")
+    ap.add_argument("--corpus", choices=["seed", "synthetic"], default="seed",
+                    help="seed = curated scaffold; synthetic = generated multi-domain corpus")
+    ap.add_argument("--n-per-domain", type=int, default=250,
+                    help="synthetic positives per domain (4 domains)")
+    ap.add_argument("--seed", type=int, default=1337, help="synthetic RNG seed")
+    # CI SLO gate: when set, exit non-zero if the overall OR any domain violates.
+    ap.add_argument("--max-leak-rate", type=float, default=None,
+                    help="fail (exit 1) if residual-leak rate exceeds this (e.g. 0.001)")
+    ap.add_argument("--min-recall", type=float, default=None,
+                    help="fail (exit 1) if micro-recall falls below this (e.g. 0.99)")
     args = ap.parse_args()
     modes = ["regex", "ner"] if args.mode == "both" else [args.mode]
+
+    if args.corpus == "synthetic":
+        corpus = generate_corpus(args.n_per_domain, seed=args.seed)
+        corpus_desc = (f"{len(corpus)} synthetic examples across "
+                       f"{len({e['domain'] for e in corpus})} domains "
+                       f"(seed={args.seed}, gateway/eval/synthetic.py)")
+    else:
+        corpus = LABELED_CORPUS
+        corpus_desc = f"{len(LABELED_CORPUS)} seed examples (gateway/eval/corpus.py)"
 
     DOCS_EVAL.mkdir(parents=True, exist_ok=True)
     detectors = {"regex": regex_detect, "ner": ner_detect}
@@ -88,7 +118,7 @@ def main() -> None:
         "# ClawWarden — PII detection evaluation",
         "",
         f"_Generated: {datetime.now(tz=timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} · "
-        f"corpus: {len(LABELED_CORPUS)} labeled examples (gateway/eval/corpus.py)._",
+        f"corpus: {corpus_desc}._",
         "",
         "Span-overlap matching, same entity type. **Residual-leak rate** is the headline "
         "product metric: the fraction of real PII values that survive tokenization and would "
@@ -96,23 +126,45 @@ def main() -> None:
         "",
     ]
 
+    gate_failed = False
     for mode in modes:
         print(f"\n=== {mode.upper()} ===")
         if mode == "ner":
             detectors["ner"]("warm up the model so latency excludes cold load")
-        r = evaluate(LABELED_CORPUS, detectors[mode])
-        results[mode] = r
+        graded = evaluate_by_domain(corpus, detectors[mode])
+        r = graded["overall"]
+        results[mode] = graded
         for t, m in sorted(r["per_type"].items()):
             print(f"  {t:<16} P={_fmt_pct(m['precision']):>6} R={_fmt_pct(m['recall']):>6} "
                   f"F1={_fmt_pct(m['f1']):>6}  tp={m['tp']} fp={m['fp']} fn={m['fn']}")
         print(f"  micro R={_fmt_pct(r['micro']['recall'])}  "
               f"residual-leak={_fmt_pct(r['residual_leak']['rate'])}  "
               f"latency p95={r['latency_ms']['p95']:.1f}ms")
-        (DOCS_EVAL / f"pii-eval-{mode}.json").write_text(json.dumps(r, indent=2), encoding="utf-8")
+        (DOCS_EVAL / f"pii-eval-{mode}.json").write_text(json.dumps(graded, indent=2), encoding="utf-8")
         report.append(_markdown(mode, r))
+        if len(graded["by_domain"]) > 1:
+            report.append(_domain_markdown(graded["by_domain"]))
+
+        # SLO gate
+        if args.max_leak_rate is not None or args.min_recall is not None:
+            ok, violations = check_slo(
+                graded,
+                max_leak_rate=args.max_leak_rate if args.max_leak_rate is not None else 1.0,
+                min_recall=args.min_recall if args.min_recall is not None else 0.0,
+            )
+            if ok:
+                print(f"  SLO gate [{mode}]: PASS")
+            else:
+                gate_failed = True
+                print(f"  SLO gate [{mode}]: FAIL")
+                for v in violations:
+                    print(f"    - {v}")
 
     (DOCS_EVAL / "pii-eval-report.md").write_text("\n".join(report), encoding="utf-8")
     print(f"\nWrote report + JSON to {DOCS_EVAL}")
+
+    if gate_failed:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
